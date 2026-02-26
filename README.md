@@ -1,4 +1,4 @@
-# 🏠 DekoHome by Meyran
+# DekoHome by Meyran
 
 <div align="center">
 
@@ -12,7 +12,7 @@
 
 ---
 
-## 📖 Proje Hakkında
+## Proje Hakkında
 
 **DekoHome by Meyran**, modern mobilya ve ev dekorasyonu dünyasını dijital ortama taşıyan, hem web hem de mobil platformlarda çalışan kapsamlı bir e-ticaret uygulamasıdır. İsveç kökenli dünyaca ünlü IKEA'nın kullanıcı dostu alışveriş deneyiminden ilham alınarak geliştirilen bu proje, Türk kullanıcılarına yerel bir alternatif sunmayı amaçlamaktadır.
 
@@ -20,69 +20,69 @@ DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atab
 
 ---
 
-## ✨ Özellikler
+## Özellikler
 
-- 🛋️ **Geniş Ürün Kataloğu** — Mobilya, aydınlatma, tekstil ve daha fazlası
-- 📱 **Web & Mobil Uyumlu** — Her cihazdan kesintisiz alışveriş deneyimi
-- 🔍 **Gelişmiş Filtreleme** — Kategori, fiyat ve isme göre arama
-- 🛒 **Akıllı Sepet** — Gerçek zamanlı stok kontrolü ile güvenli alışveriş
-- 📦 **Sipariş Takibi** — Siparişlerinizi anlık olarak takip edin
-- ⭐ **Kullanıcı Yorumları** — Gerçek alıcıların deneyimlerine ulaşın
-- 🖼️ **Kampanya Slaytları** — Güncel fırsatları kaçırmayın
+- **Geniş Ürün Kataloğu** — Mobilya, aydınlatma, tekstil ve daha fazlası
+- **Web & Mobil Uyumlu** — Her cihazdan kesintisiz alışveriş deneyimi
+- **Gelişmiş Filtreleme** — Kategori, fiyat ve isme göre arama
+- **Akıllı Sepet** — Gerçek zamanlı stok kontrolü ile güvenli alışveriş
+- **Sipariş Takibi** — Siparişlerinizi anlık olarak takip edin
+- **Kullanıcı Yorumları** — Gerçek alıcıların deneyimlerine ulaşın
+- **Kampanya Slaytları** — Güncel fırsatları kaçırmayın
 
 ---
 
-## 🗂️ Proje Kategorisi
+## Proje Kategorisi
 
 **E-Ticaret** — Mobilya & Ev Dekorasyonu
 
 ---
 
-## 🔗 Referans Uygulama
+## Referans Uygulama
 
 [![IKEA](https://img.shields.io/badge/IKEA-Referans%20Uygulama-0058A3?style=flat-square&logo=ikea&logoColor=FFD700)](https://www.ikea.com/tr/tr/)
 
 ---
 
-## 🌐 Proje Linkleri
+## Proje Linkleri
 
 | Servis | Adres |
 |--------|-------|
-| 🔌 REST API | `api.yazmuh.com` |
-| 💻 Web Frontend | `frontend.yazmuh.com` |
-| 📁 GitHub | [github.com/EbrarKarakoc/DekoHome](https://github.com/EbrarKarakoc/DekoHome) |
+| REST API | `api.yazmuh.com` |
+| Web Frontend | `frontend.yazmuh.com` |
+| GitHub | [github.com/EbrarKarakoc/DekoHome](https://github.com/EbrarKarakoc/DekoHome) |
 
 ---
 
-## 👥 Proje Ekibi
+## Proje Ekibi
 
 **Grup Adı:** Meyran
 
 | İsim | Sorumluluk |
 |------|------------|
-| 👩‍💻 Gülnihal Köse | Kullanıcı İşlemleri & Ürün Ekleme/Silme |
-| 👩‍💻 Şerife Nur Yılmaz | Kategori İşlemleri & Ürün Güncelleme/Listeleme |
-| 👩‍💻 Ebrar Karakoç | Sipariş İşlemleri & Yorum Ekleme/Silme |
-| 👩‍💻 Dilan Günsili | Sepet İşlemleri & Yorum Güncelleme/Listeleme |
+| Gülnihal Köse | Kullanıcı İşlemleri & Ürün Ekleme/Silme |
+| Şerife Nur Yılmaz | Kategori İşlemleri & Ürün Güncelleme/Listeleme |
+| Ebrar Karakoç | Sipariş İşlemleri & Yorum Ekleme/Silme |
+| Dilan Günsili | Sepet İşlemleri & Yorum Güncelleme/Listeleme |
 
 ---
 
-## 📚 Dokümantasyon
+## Dokümantasyon
 
 Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
 
-- 📋 [Gereksinim Analizi](Gereksinim-Analizi.md)
-- 🔌 REST API Tasarımı
-- ⚙️ REST API
-- 🖥️ Web Front-End
-- 📱 Mobil Front-End
-- 📲 Mobil Backend
-- 🎥 Video Sunum
+- [Gereksinim Analizi](Gereksinim-Analizi.md)
+- REST API Tasarımı
+- REST API
+- Web Front-End
+- Mobil Front-End
+- Mobil Backend
+- Video Sunum
 
 ---
 
 <div align="center">
 
-**DekoHome by Meyran** — *Evinize değer katıyoruz.* 🏠✨
+**DekoHome by Meyran** — *Evinize değer katıyoruz.*
 
 </div>
