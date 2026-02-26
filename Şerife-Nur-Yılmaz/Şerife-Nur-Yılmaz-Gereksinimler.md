@@ -1,6 +1,6 @@
 # 🛠️ Şerife Nur Yılmaz | Detaylı Gereksinim Analizi
 
-Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tarafından üstlenilen kategori yönetimi, ürün operasyonları ve vitrin bileşenlerinin kapsamlı teknik analizini içermektedir.
+Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tarafından üstlenilen kategori yönetimi ve ürün operasyonlarının (Ekleme, Silme, Güncelleme, Listeleme) kapsamlı teknik analizini içermektedir.
 
 ---
 
@@ -20,7 +20,7 @@ Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tara
 
 ---
 
-### 📦 Ürün ve Vitrin İşlemleri (Product & Showcase)
+### 📦 Ürün Yönetimi (Product Management)
 
 #### 📋 3. Ürün Ekleme
 * **API Metodu**: `POST /products`
@@ -40,8 +40,8 @@ Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tara
 * **Detaylı Açıklama**: Envanterdeki ürünlerin genel bir liste halinde kullanıcıya sunulmasıdır. Performans optimizasyonu için sayfalama (pagination) desteği barındırır; böylece web ve mobil uygulamalarda veriler hızlı ve akıcı bir şekilde yüklenir. Kullanıcının mağaza genelindeki ürünleri keşfetmesini sağlayan temel modüldür.
 * **Yetki**: **Tüm kullanıcılar** tarafından erişilebilir.
 
-#### 📋 6. Slayt Görüntüleme
-* **API Metodu**: `GET /sliders`
-* **Gereksinim Özeti**: Ana sayfada sergilenecek olan promosyon ve kampanya banner'larının listelenmesini sağlar.
-* **Detaylı Açıklama**: Dinamik banner yapısı sayesinde her slayt için özel başlık, görsel, yönlendirme bağlantısı ve gösterim sırası bilgileri sunulur. Bu sayede hem web hem de mobil uygulamaların ana ekranında güncel kampanyalar ve öne çıkan fırsatlar dinamik olarak gösterilebilir.
-* **Yetki**: **Tüm kullanıcılar** tarafından erişilebilir.
+#### 📋 6. Ürün Silme
+* **API Metodu**: `DELETE /products/{productId}`
+* **Gereksinim Özeti**: Sistemde kayıtlı olan ve artık satışı yapılmayan bir ürünün kalıcı olarak silinmesini sağlar.
+* **Detaylı Açıklama**: Hatalı girilen veya envanterden tamamen çıkarılan ürünlerin sistemden temizlenmesi için kullanılır. Silme işlemi öncesinde ürünün aktif siparişlerde bulunup bulunmadığı kontrol edilir; aktif bir siparişte yer alan ürünler için sistem admin'e uyarı mesajı gösterir.
+* **Yetki**: Yalnızca **Admin** tarafından gerçekleştirilebilir.
