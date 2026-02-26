@@ -1,51 +1,47 @@
-# 🛠️ Şerife Nur Yılmaz | Gereksinim Analizi & API Tasarımı
+# 🛠️ Şerife Nur Yılmaz | Detaylı Gereksinim Analizi
 
-Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tarafından yönetilen kategori yönetimi, ürün operasyonları ve vitrin bileşenlerinin teknik gereksinimlerini içermektedir.
-
----
-
-### 📂 Kategori Yönetimi (Category Management)
-
-#### 📋 Kategori Gereksinim Detayları
-
-* **1. Kategori Güncelleme (Update Category)**:
-    * **API Metodu**: `PUT /categories/{categoryId}`
-    * **Açıklama**: Mevcut bir kategorinin adı, açıklaması veya hiyerarşik (üst kategori) bilgisinin güncellenmesini sağlar.
-    * **Detay**: Güncelleme sonrası değişiklikler sistem genelinde anlık olarak yansıtılır.
-    * **Yetki**: Yalnızca admin tarafından gerçekleştirilebilir.
-
-* **2. Kategori Listeleme (View Categories)**:
-    * **API Metodu**: `GET /categories`
-    * **Açıklama**: Sistemde tanımlı tüm kategorilerin hiyerarşik yapıda listelenmesini sağlar.
-    * **Kullanım**: Hem web hem mobil arayüzde menü yapısının oluşturulması için kullanılır.
-    * **Erişim**: Tüm kullanıcılar tarafından erişilebilir.
+Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tarafından üstlenilen kategori yönetimi, ürün operasyonları ve vitrin bileşenlerinin kapsamlı teknik analizini içermektedir.
 
 ---
 
-### 📦 Ürün & Vitrin İşlemleri (Product & Showcase)
+### 📂 Kategori İşlemleri (Category Operations)
 
-#### 📋 Ürün ve Vitrin Gereksinim Detayları
+#### 📋 1. Kategori Güncelleme
+* **API Metodu**: `PUT /categories/{categoryId}`
+* **Gereksinim Özeti**: Mevcut bir kategorinin sistem üzerindeki tanımlayıcı bilgilerinin revize edilmesini sağlar.
+* **Detaylı Açıklama**: Admin paneli aracılığıyla bir kategorinin ismi, açıklaması veya hiyerarşik yapısı (üst kategori bilgisi) değiştirilebilir. Bu işlem, mağaza yapısında yapılan köklü değişikliklerin sisteme yansıtılması için kritiktir. Güncelleme onaylandığı anda ilgili kategorinin tüm metadata bilgileri veritabanında güncellenerek kullanıcı arayüzüne anlık olarak yansıtılır.
+* **Yetki**: Veri bütünlüğünü korumak adına yalnızca **Admin** tarafından gerçekleştirilebilir.
 
-* **3. Ürün Ekleme (Add New Product)**:
-    * **API Metodu**: `POST /products`
-    * **Açıklama**: Sisteme yeni mobilya veya dekorasyon ürünlerinin eklenmesini sağlar.
-    * **İşlem**: Ürün adı, açıklaması, fiyatı, stok miktarı ve görselleri gibi bilgiler veritabanına kaydedilir.
-    * **Yetki**: Yalnızca admin tarafından gerçekleştirilebilir.
+#### 📋 2. Kategori Listeleme
+* **API Metodu**: `GET /categories`
+* **Gereksinim Özeti**: Sistemde tanımlı tüm kategorilerin hiyerarşik bir düzende getirilmesini sağlar.
+* **Detaylı Açıklama**: Mağazadaki ana kategoriler ve onlara bağlı alt kategoriler düzenli bir ağaç yapısında listelenir. Bu veriler, hem web hem de mobil platformlarda kullanıcıların ürünlere ulaşmasını sağlayan navigasyon menülerinin dinamik olarak oluşturulması için temel kaynaktır.
+* **Yetki**: **Tüm kullanıcılar** (misafir veya kayıtlı) tarafından erişilebilir.
 
-* **4. Ürün Güncelleme (Update Product Details)**:
-    * **API Metodu**: `PUT /products/{productId}`
-    * **Açıklama**: Mevcut bir ürünün adı, açıklaması, fiyatı, stok miktarı veya kategori bilgisinin revize edilmesini sağlar.
-    * **Detay**: Güncelleme sonrası değişiklikler ürün sayfasına anında yansıtılır.
-    * **Yetki**: Yalnızca admin tarafından gerçekleştirilebilir.
+---
 
-* **5. Ürün Listeleme (Browse Products)**:
-    * **API Metodu**: `GET /products`
-    * **Açıklama**: Sistemde kayıtlı tüm ürünlerin bir liste halinde sunulmasını sağlar.
-    * **Özellik**: Ürünler kategoriye, fiyata veya isme göre filtrelenebilir ve sıralanabilir.
-    * **Performans**: Sayfalama desteği ile hem web hem mobil uygulamada verimli çalışır.
+### 📦 Ürün ve Vitrin İşlemleri (Product & Showcase)
 
-* **6. Slayt Görüntüleme (View Showcase Sliders)**:
-    * **API Metodu**: `GET /sliders`
-    * **Açıklama**: Ana sayfada gösterilecek promosyon ve kampanya slaytlarının listelenmesini sağlar.
-    * **İçerik**: Her slayt için başlık, görsel, yönlendirme bağlantısı ve sıra bilgisi döndürülür.
-    * **Erişim**: Tüm kullanıcılar tarafından erişilebilir.
+#### 📋 3. Ürün Ekleme
+* **API Metodu**: `POST /products`
+* **Gereksinim Özeti**: Sisteme yeni mobilya veya dekorasyon ürünlerinin dahil edilmesini sağlar.
+* **Detaylı Açıklama**: Yeni bir ürünün adı, detaylı açıklaması, satış fiyatı, güncel stok miktarı, bağlı olduğu kategori ve görsel materyalleri bu fonksiyon aracılığıyla veritabanına kaydedilir. Mağaza envanterinin genişletilmesi ve yeni koleksiyonların satışa sunulması bu modül üzerinden yönetilir.
+* **Yetki**: Yalnızca **Admin** tarafından gerçekleştirilebilir.
+
+#### 📋 4. Ürün Güncelleme
+* **API Metodu**: `PUT /products/{productId}`
+* **Gereksinim Özeti**: Mevcut bir ürünün fiyat, stok veya açıklama gibi kritik bilgilerinin güncellenmesini sağlar.
+* **Detaylı Açıklama**: Satıştaki bir ürünün fiyatında yapılan değişiklikler, stok miktarındaki güncellemeler veya ürün açıklamasındaki teknik detay revizeleri bu işlemle gerçekleştirilir. Yapılan değişiklikler ürün sayfasında anında yayınlanarak müşterilerin doğru bilgiye ulaşması sağlanır.
+* **Yetki**: Yalnızca **Admin** tarafından gerçekleştirilebilir.
+
+#### 📋 5. Ürün Listeleme
+* **API Metodu**: `GET /products`
+* **Gereksinim Özeti**: Sistemde kayıtlı olan tüm ürün kataloğunun listelenmesini sağlar.
+* **Detaylı Açıklama**: Envanterdeki ürünlerin genel bir liste halinde kullanıcıya sunulmasıdır. Performans optimizasyonu için sayfalama (pagination) desteği barındırır; böylece web ve mobil uygulamalarda veriler hızlı ve akıcı bir şekilde yüklenir. Kullanıcının mağaza genelindeki ürünleri keşfetmesini sağlayan temel modüldür.
+* **Yetki**: **Tüm kullanıcılar** tarafından erişilebilir.
+
+#### 📋 6. Slayt Görüntüleme
+* **API Metodu**: `GET /sliders`
+* **Gereksinim Özeti**: Ana sayfada sergilenecek olan promosyon ve kampanya banner'larının listelenmesini sağlar.
+* **Detaylı Açıklama**: Dinamik banner yapısı sayesinde her slayt için özel başlık, görsel, yönlendirme bağlantısı ve gösterim sırası bilgileri sunulur. Bu sayede hem web hem de mobil uygulamaların ana ekranında güncel kampanyalar ve öne çıkan fırsatlar dinamik olarak gösterilebilir.
+* **Yetki**: **Tüm kullanıcılar** tarafından erişilebilir.
