@@ -28,6 +28,6 @@
 # Gereksinim Dağılımları
 
 1. [Gülnihal Köse'nin Gereksinimleri](Gülnihal-Köse/Gülnihal-Köse-Gereksinimler.md)
-2. [Şerife Nur Yılmaz'ın Gereksinimleri](Şerife-Nur-Yılmaz/Şerife-Nur-Yılmaz-Gereksinimler.md)
+2. [Şerife Nur Yılmaz'ın Gereksinimleri](Şerife%20Nur%20YILMAZ/%C5%9Eerife-Nur-Y%C4%B1lmaz-Gereksinimler.md)
 3. [Ebrar Karakoç'un Gereksinimleri](Ebrar-Karakoç/Ebrar-Karakoç-Gereksinimler.md)
 4. [Dilan Günsili'nin Gereksinimleri](Dilan-Günsili/Dilan-Günsili-Gereksinimler.md)

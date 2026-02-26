@@ -3,75 +3,63 @@
 ---
 
 ## 1. Kategori Ekleme (Admin Add Category)
-
 **Açıklama:**
-
 - **API Metodu:** `POST /categories`
-- Satıcı veya yönetici, ürünleri organize etmek amacıyla sisteme yeni bir kategori ekleyebilir.
-- Kategori adı, açıklaması ve varsa üst kategori bilgileri girilerek veritabanına kaydedilir.
-- Bu işlem yalnızca admin yetkisine sahip kullanıcılar tarafından gerçekleştirilebilir.
+- Ürünlerin organize edilmesi için sisteme yeni bir kategori eklenmesini sağlar.
+- Kategori adı, açıklaması ve üst kategori bilgisi girilerek veritabanına kaydedilir.
+- Yalnızca admin tarafından gerçekleştirilebilir.
 
 ---
 
 ## 2. Kategori Güncelleme (Admin Update Category)
-
 **Açıklama:**
-
 - **API Metodu:** `PUT /categories/{categoryId}`
-- Mevcut bir kategorinin ismi, açıklaması veya hiyerarşik konumu değiştirilebilir.
-- Yapılan güncellemeler veritabanında anlık olarak işlenir ve kullanıcı arayüzüne yansıtılır.
-- Yalnızca admin yetkisiyle erişilebilir bir fonksiyondur.
+- Mevcut bir kategorinin adı, açıklaması veya üst kategori bilgisinin güncellenmesini sağlar.
+- Güncelleme sonrası değişiklikler anında sisteme yansıtılır.
+- Yalnızca admin tarafından gerçekleştirilebilir.
 
 ---
 
 ## 3. Kategori Listeleme (View Categories)
-
 **Açıklama:**
-
 - **API Metodu:** `GET /categories`
-- Sistemde tanımlı tüm kategoriler, kullanıcıların ürünlere hızlı erişmesi için hiyerarşik yapıda listelenir.
-- Hem web hem mobil arayüzde menü yapısının dinamik oluşturulması için kullanılır.
-- Tüm kullanıcılar (misafir veya kayıtlı) tarafından görüntülenebilir.
+- Sistemde tanımlı tüm kategorilerin listelenmesini sağlar.
+- Ana kategoriler ve alt kategoriler hiyerarşik yapıda görüntülenir.
+- Hem web hem mobil arayüzde menü yapısının oluşturulması için kullanılır.
+- Tüm kullanıcılar tarafından erişilebilir.
 
 ---
 
 ## 4. Kategori Silme (Admin Delete Category)
-
 **Açıklama:**
-
 - **API Metodu:** `DELETE /categories/{categoryId}`
-- İhtiyaç duyulmayan veya yanlış açılan kategorilerin sistemden kaldırılmasını sağlar.
-- Silme işlemi öncesinde kategorinin boş olup olmadığı kontrol edilerek veri bütünlüğü korunur.
-- Yalnızca yönetici (admin) profili tarafından gerçekleştirilebilir.
+- Sistemde kayıtlı olan ve artık kullanılmayan bir kategorinin silinmesini sağlar.
+- Silme işlemi öncesinde kategoriye bağlı ürün kontrolü yapılır.
+- Yalnızca admin tarafından gerçekleştirilebilir.
 
 ---
 
 ## 5. Ürün Güncelleme (Admin Update Product)
-
 **Açıklama:**
-
 - **API Metodu:** `PUT /products/{productId}`
-- Satıcı, mevcut bir ürünün fiyatını, stok miktarını, açıklamasını veya kategori bilgisini güncelleyebilir.
+- Mevcut bir ürünün adı, açıklaması, fiyatı, stok miktarı veya kategori bilgisinin güncellenmesini sağlar.
 - Güncelleme sonrası değişiklikler ürün sayfasına anında yansıtılır.
+- Yalnızca admin tarafından gerçekleştirilebilir.
 
 ---
 
-## 6. Ürünleri Listeleme (View Products)
-
+## 6. Ürün Listeleme (View Products)
 **Açıklama:**
-
 - **API Metodu:** `GET /products`
-- Sistemde kayıtlı tüm ürünlerin bir liste halinde sunulmasını sağlar.
+- Sistemde kayıtlı tüm ürünlerin listelenmesini sağlar.
 - Ürünler kategoriye, fiyata veya isme göre filtrelenebilir ve sıralanabilir.
-- Sayfalama desteği ile yüksek performanslı çalışma hedeflenir.
+- Tüm kullanıcılar tarafından erişilebilir.
 
 ---
 
-## 7. Kampanya Slaytlarını Görüntüle (View Promo Sliders)
-
+## 7. Slayt Görüntüleme (View Sliders)
 **Açıklama:**
-
 - **API Metodu:** `GET /sliders`
-- Ana sayfada gösterilecek olan promosyon ve kampanya slaytlarının listesini getirir.
-- Her slayt başlık, görsel ve yönlendirme bağlantısı içerir.
-- Dinamik banner gösterimi için tüm kullanıcılar tarafından erişilebilir.
+- Ana sayfada gösterilecek promosyon ve kampanya slaytlarının listelenmesini sağlar.
+- Her slayt için başlık, görsel, yönlendirme bağlantısı ve sıra bilgisi döndürülür.
+- Tüm kullanıcılar tarafından erişilebilir.
