@@ -1,5 +1,3 @@
-# Kullanıcı Odaklı Gereksinimler (IKEA Benzeri E-Ticaret Sitesi)
-
 ## 1. Üye Olma
 - **API Metodu:** `POST /auth/register`
 - **Açıklama:** Kullanıcıların siteye kayıt olarak kendi hesaplarını oluşturmalarını sağlar. Bu süreçte kullanıcılar email ve şifre belirler, gerekli kişisel bilgilerini girer. Sistem, bilgileri güvenli bir şekilde saklar ve kullanıcıya kayıt onayı gönderir. Bu adım, kişiselleştirilmiş alışveriş deneyimi ve sipariş takibi için temel bir gerekliliktir.
