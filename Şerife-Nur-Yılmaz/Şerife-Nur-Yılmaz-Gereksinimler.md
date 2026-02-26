@@ -1,60 +1,51 @@
+# 🛠️ Şerife Nur Yılmaz | Gereksinim Analizi & API Tasarımı
 
-# 🛠️ Şerife Nur Yılmaz | Gereksinim Analizi
-
-Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tarafından yönetilen kategori işlemleri, ürün güncellemeleri ve vitrin bileşenlerinin teknik gereksinimlerini içerir.
+Bu doküman, **DekoHome by Meyran** projesi kapsamında Şerife Nur Yılmaz tarafından yönetilen kategori yönetimi, ürün operasyonları ve vitrin bileşenlerinin teknik gereksinimlerini içermektedir.
 
 ---
 
 ### 📂 Kategori Yönetimi (Category Management)
 
-| Özellik | Metot | Endpoint | Yetki |
-| :--- | :--- | :--- | :--- |
-| **Kategori Ekleme** | `POST` | `/categories` | Admin |
-| **Kategori Güncelleme** | `PUT` | `/categories/{categoryId}` | Admin |
-| **Kategori Listeleme** | `GET` | `/categories` | Herkes |
-| **Kategori Silme** | `DELETE` | `/categories/{categoryId}` | Admin |
+#### 📋 Kategori Gereksinim Detayları
 
-#### 📋 Detaylı Gereksinim Açıklamaları
+* **1. Kategori Güncelleme (Update Category)**:
+    * **API Metodu**: `PUT /categories/{categoryId}`
+    * **Açıklama**: Mevcut bir kategorinin adı, açıklaması veya hiyerarşik (üst kategori) bilgisinin güncellenmesini sağlar.
+    * **Detay**: Güncelleme sonrası değişiklikler sistem genelinde anlık olarak yansıtılır.
+    * **Yetki**: Yalnızca admin tarafından gerçekleştirilebilir.
 
-* **1. Kategori Ekleme (Admin Add Category)**:
-    * **Açıklama**: Ürünlerin organize edilmesi için sisteme yeni bir kategori eklenmesini sağlar.
-    * **İşlem**: Kategori adı, açıklaması ve üst kategori bilgisi girilerek veritabanına kaydedilir.
-    * **Erişim**: Yalnızca admin tarafından gerçekleştirilebilir.
-
-* **2. Kategori Güncelleme (Admin Update Category)**:
-    * **Açıklama**: Mevcut bir kategorinin adı, açıklaması veya üst kategori bilgisinin güncellenmesini sağlar.
-    * **İşlem**: Güncelleme sonrası değişiklikler anında sisteme yansıtılır.
-    * **Erişim**: Yalnızca admin tarafından gerçekleştirilebilir.
-
-* **3. Kategori Listeleme (View Categories)**:
-    * **Açıklama**: Sistemde tanımlı tüm kategorilerin listelenmesini sağlar.
-    * **İşlem**: Ana kategoriler ve alt kategoriler hiyerarşik yapıda görüntülenir.
+* **2. Kategori Listeleme (View Categories)**:
+    * **API Metodu**: `GET /categories`
+    * **Açıklama**: Sistemde tanımlı tüm kategorilerin hiyerarşik yapıda listelenmesini sağlar.
     * **Kullanım**: Hem web hem mobil arayüzde menü yapısının oluşturulması için kullanılır.
     * **Erişim**: Tüm kullanıcılar tarafından erişilebilir.
-
-* **4. Kategori Silme (Admin Delete Category)**:
-    * **Açıklama**: Sistemde kayıtlı olan ve artık kullanılmayan bir kategorinin silinmesini sağlar.
-    * **İşlem**: Silme işlemi öncesinde kategoriye bağlı ürün kontrolü yapılır.
-    * **Erişim**: Yalnızca admin tarafından gerçekleştirilebilir.
 
 ---
 
 ### 📦 Ürün & Vitrin İşlemleri (Product & Showcase)
 
-#### 🔄 5. Ürün Güncelleme (Admin Update Product)
-* **API Metodu**: `PUT /products/{productId}`
-* **Açıklama**: Mevcut bir ürünün adı, açıklaması, fiyatı, stok miktarı veya kategori bilgisinin güncellenmesini sağlar.
-* **Detay**: Güncelleme sonrası değişiklikler ürün sayfasına anında yansıtılır.
-* **Yetki**: Yalnızca admin tarafından gerçekleştirilebilir.
+#### 📋 Ürün ve Vitrin Gereksinim Detayları
 
-#### 🔍 6. Ürün Listeleme (View Products)
-* **API Metodu**: `GET /products`
-* **Açıklama**: Sistemde kayıtlı tüm ürünlerin listelenmesini sağlar.
-* **Detay**: Ürünler kategoriye, fiyata veya isme göre filtrelenebilir ve sıralanabilir.
-* **Yetki**: Tüm kullanıcılar tarafından erişilebilir.
+* **3. Ürün Ekleme (Add New Product)**:
+    * **API Metodu**: `POST /products`
+    * **Açıklama**: Sisteme yeni mobilya veya dekorasyon ürünlerinin eklenmesini sağlar.
+    * **İşlem**: Ürün adı, açıklaması, fiyatı, stok miktarı ve görselleri gibi bilgiler veritabanına kaydedilir.
+    * **Yetki**: Yalnızca admin tarafından gerçekleştirilebilir.
 
-#### 🖼️ 7. Slayt Görüntüleme (View Sliders)
-* **API Metodu**: `GET /sliders`
-* **Açıklama**: Ana sayfada gösterilecek promosyon ve kampanya slaytlarının listelenmesini sağlar.
-* **Detay**: Her slayt için başlık, görsel, yönlendirme bağlantısı ve sıra bilgisi döndürülür.
-* **Yetki**: Tüm kullanıcılar tarafından erişilebilir.
+* **4. Ürün Güncelleme (Update Product Details)**:
+    * **API Metodu**: `PUT /products/{productId}`
+    * **Açıklama**: Mevcut bir ürünün adı, açıklaması, fiyatı, stok miktarı veya kategori bilgisinin revize edilmesini sağlar.
+    * **Detay**: Güncelleme sonrası değişiklikler ürün sayfasına anında yansıtılır.
+    * **Yetki**: Yalnızca admin tarafından gerçekleştirilebilir.
+
+* **5. Ürün Listeleme (Browse Products)**:
+    * **API Metodu**: `GET /products`
+    * **Açıklama**: Sistemde kayıtlı tüm ürünlerin bir liste halinde sunulmasını sağlar.
+    * **Özellik**: Ürünler kategoriye, fiyata veya isme göre filtrelenebilir ve sıralanabilir.
+    * **Performans**: Sayfalama desteği ile hem web hem mobil uygulamada verimli çalışır.
+
+* **6. Slayt Görüntüleme (View Showcase Sliders)**:
+    * **API Metodu**: `GET /sliders`
+    * **Açıklama**: Ana sayfada gösterilecek promosyon ve kampanya slaytlarının listelenmesini sağlar.
+    * **İçerik**: Her slayt için başlık, görsel, yönlendirme bağlantısı ve sıra bilgisi döndürülür.
+    * **Erişim**: Tüm kullanıcılar tarafından erişilebilir.
