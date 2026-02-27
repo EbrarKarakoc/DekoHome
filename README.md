@@ -1,7 +1,7 @@
 # DekoHome by Meyran
 
 <p align="center">
-  <img src="gorselKlasoru/kapakFoto.jpeg" alt="DekoHome Banner" width="100%">
+  <img src="https://raw.githubusercontent.com/EbrarKarakoc/DekoHome/main/kapakFoto.jpeg" width="100%">
 </p>
 
 <div align="center">
