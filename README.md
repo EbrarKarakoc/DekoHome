@@ -1,8 +1,14 @@
-#  DekoHome by Meyran
+# DekoHome by Meyran
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/EbrarKarakoc/DekoHome/main/kapakFoto.jpeg" width="100%">
+</p>
 
 <div align="center">
-![DekoHome Banner](assets/warnıng.png)
 
+![DekoHome Banner](https://img.shields.io/badge/DekoHome-by%20Meyran-FF6B35?style=for-the-badge&logo=home-assistant&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Web%20%26%20Mobil-4ECDC4?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Geliştiriliyor-FFE66D?style=for-the-badge)
 
 > *Evinizi hayal ettiğiniz gibi tasarlayın.*
 
@@ -10,59 +16,77 @@
 
 ---
 
+## Proje Hakkında
 
+**DekoHome by Meyran**, modern mobilya ve ev dekorasyonu dünyasını dijital ortama taşıyan, hem web hem de mobil platformlarda çalışan kapsamlı bir e-ticaret uygulamasıdır. İsveç kökenli dünyaca ünlü IKEA'nın kullanıcı dostu alışveriş deneyiminden ilham alınarak geliştirilen bu proje, Türk kullanıcılarına yerel bir alternatif sunmayı amaçlamaktadır.
 
-# DekoHome – Yaşam Alanlarınıza İlham Verin
-
-DekoHome, yaşam alanlarınızı kolayca güzelleştirmeniz için tasarlanmış bir e-ticaret platformudur. Geniş ürün yelpazemizle oturma odasından yatak odasına, mutfaktan ofise kadar her alan için pratik ve şık çözümler sunuyoruz. Kullanıcı dostu arayüzümüz sayesinde aradığınız ürünleri hızlıca bulabilir, filtreleme ve kategori seçenekleri ile alışverişinizi tamamen kişiselleştirebilirsiniz.
-
-Sitemizdeki ürünler, güvenilir markaların kaliteli ve modern tasarımlarından oluşur; estetik ve fonksiyonelliği bir arada sunarak yaşam alanlarınıza değer katmayı hedefler. Hızlı teslimat seçenekleri, güvenli ödeme sistemleri ve sorunsuz iade politikamızla alışverişinizi keyifli ve sorunsuz hâle getiriyoruz.
-
-Müşteri memnuniyeti bizim önceliğimizdir. DekoHome olarak, en iyi fiyatlarla, kaliteli ve trend ürünleri sizlerle buluşturmak için sürekli çalışıyoruz. Ev dekorasyonunu, ofis düzenlemelerini veya yaşam alanlarınıza şıklık katmayı keyifli ve kolay bir deneyime dönüştürmek için buradayız. 
-
-**DekoHome’a hoş geldiniz — size ilham verici ve pratik bir alışveriş deneyimi sunmak için sabırsızlanıyoruz.**
+DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atabilir, kategorilere göre filtreleme yapabilir, ürünleri sanal sepetlerine ekleyerek kolayca sipariş verebilir ve satın aldıkları ürünler için yorum bırakabilir. Güvenli ödeme altyapısı, hızlı sipariş takip sistemi ve sezgisel arayüz tasarımıyla DekoHome, online ev alışverişini keyifli ve zahmetsiz bir deneyime dönüştürmektedir.
 
 ---
 
-## 🗂️ Proje Kategorisi
+## Özellikler
+
+- **Geniş Ürün Kataloğu** — Mobilya, aydınlatma, tekstil ve daha fazlası
+- **Web & Mobil Uyumlu** — Her cihazdan kesintisiz alışveriş deneyimi
+- **Gelişmiş Filtreleme** — Kategori, fiyat ve isme göre arama
+- **Akıllı Sepet** — Gerçek zamanlı stok kontrolü ile güvenli alışveriş
+- **Sipariş Takibi** — Siparişlerinizi anlık olarak takip edin
+- **Kullanıcı Yorumları** — Gerçek alıcıların deneyimlerine ulaşın
+- **Kampanya Slaytları** — Güncel fırsatları kaçırmayın
+
+---
+
+## Proje Kategorisi
 
 **E-Ticaret** — Mobilya & Ev Dekorasyonu
 
 ---
 
-## 🔗 Referans Uygulama
-# Referans Uygulama
+## Referans Uygulama
 
-Örnek referans uygulama olarak **[IKEA Türkiye](https://www.ikea.com.tr/)** kullanılmıştır.  
+[![IKEA](https://img.shields.io/badge/IKEA-Referans%20Uygulama-0058A3?style=flat-square&logo=ikea&logoColor=FFD700)](https://www.ikea.com/tr/tr/)
 
 ---
 
-## 🌐 Proje Linkleri
+## Proje Linkleri
 
-# Proje Linkleri
+| Servis | Adres |
+|--------|-------|
+| REST API | `api.yazmuh.com` |
+| Web Frontend | `frontend.yazmuh.com` |
+| GitHub | [github.com/EbrarKarakoc/DekoHome](https://github.com/EbrarKarakoc/DekoHome) |
 
-- **Proje Reposu:** [DekoHome GitHub](https://github.com/EbrarKarakoc/DekoHome)
-- **REST API Adresi:** (Henüz canlı değil, geliştirme aşamasında)
-- **Web Frontend Adresi:** (Henüz canlı değil, geliştirme aşamasında)
 ---
 
-## 👥 Proje Ekibi
+## Proje Ekibi
 
-# Grup Adı **Meyran**
+**Grup Adı:** Meyran
 
-## Ekip Üyeleri
+| İsim | Sorumluluk |
+|------|------------|
+| Gülnihal Köse | Kullanıcı İşlemleri & Ürün Ekleme/Silme |
+| Şerife Nur Yılmaz | Kategori İşlemleri & Ürün Güncelleme/Listeleme |
+| Ebrar Karakoç | Sipariş İşlemleri & Yorum Ekleme/Silme |
+| Dilan Günsili | Sepet İşlemleri & Yorum Güncelleme/Listeleme |
 
--  Gülnihal Köse – Kullanıcı İşlemleri & Kategori Ekleme/Silme  
--  Şerife Nur Yılmaz – Kategori İşlemleri & Ürün Güncelleme/Listeleme  
--  Ebrar Karakoç – Sipariş İşlemleri & Yorum Ekleme/Silme  
--  Dilan Günsili – Sepet İşlemleri & Yorum Güncelleme/Listeleme
+---
 
+## Dokümantasyon
 
+Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
+
+- [Gereksinim Analizi](Gereksinim-Analizi.md)
+- REST API Tasarımı
+- REST API
+- Web Front-End
+- Mobil Front-End
+- Mobil Backend
+- Video Sunum
 
 ---
 
 <div align="center">
 
-**DekoHome by Meyran** — *Evinize değer katıyoruz.* 
+**DekoHome by Meyran** — *Evinize değer katıyoruz.*
 
 </div>
