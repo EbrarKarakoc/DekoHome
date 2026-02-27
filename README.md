@@ -64,7 +64,7 @@ DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atab
 
 | İsim | Sorumluluk |
 |------|------------|
-| Gülnihal Köse | Kullanıcı İşlemleri & Ürün Ekleme/Silme |
+| Gülnihal Köse | Kullanıcı İşlemleri & Kategori Ekleme/Silme |
 | Şerife Nur Yılmaz | Kategori İşlemleri & Ürün Güncelleme/Listeleme |
 | Ebrar Karakoç | Sipariş İşlemleri & Yorum Ekleme/Silme |
 | Dilan Günsili | Sepet İşlemleri & Yorum Güncelleme/Listeleme |
