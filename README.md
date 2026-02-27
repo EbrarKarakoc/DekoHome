@@ -1,5 +1,9 @@
 # DekoHome by Meyran
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/EbrarKarakoc/DekoHome/main/kapakFoto.jpeg" width="100%">
+</p>
+
 <div align="center">
 
 ![DekoHome Banner](https://img.shields.io/badge/DekoHome-by%20Meyran-FF6B35?style=for-the-badge&logo=home-assistant&logoColor=white)
