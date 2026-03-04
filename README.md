@@ -76,7 +76,7 @@ DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atab
 Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
 
 - [Gereksinim Analizi](Gereksinim-Analizi.md)
-- REST API Tasarımı
+- [REST API Tasarımı](API-Tasarimi.md)
 - REST API
 - Web Front-End
 - Mobil Front-End
