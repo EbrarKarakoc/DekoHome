@@ -77,7 +77,7 @@ Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
 
 - [Gereksinim Analizi](Gereksinim-Analizi.md)
 - [REST API Tasarımı](API-Tasarimi.md)
-- REST API
+- [REST API Metotları](Reset-API.md)
 - Web Front-End
 - Mobil Front-End
 - Mobil Backend
