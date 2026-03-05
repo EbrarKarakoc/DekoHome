@@ -8,8 +8,7 @@ Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST
 
 ## Grup Üyelerinin REST API Metotları
 
-1. [Ali Tutar'ın REST API Metotları](Ali-Tutar/Ali-Tutar-Rest-API-Gorevleri.md)
-2. [Dilan Günsili'nin REST API Metotları](Dilan-Günsili/Dilan-Günsili-Rest-API-Gorevleri.md)
-3. [Ebrar Karakoç'un REST API Metotları](Ebrar-Karakoc/Ebrar-Karakoc-Rest-API-Gorevleri.md)
-4. [Gülnihal Köse'nin REST API Metotları](Gülnihal-Köse/Gülnihal-Köse-Rest-API-Gorevleri.md)
-5. [Şerife Nur Yılmaz'ın REST API Metotları](Şerife-Nur-Yılmaz/Şerife-Nur-Yılmaz-Rest-API-Gorevleri.md)
+1. [Dilan Günsili'nin REST API Metotları](Dilan-Günsili/Dilan-Günsili-Rest-API-Gorevleri.md)
+2. [Ebrar Karakoç'un REST API Metotları](Ebrar-Karakoc/Ebrar-Karakoc-Rest-API-Gorevleri.md)
+3. [Gülnihal Köse'nin REST API Metotları](Gülnihal-Köse/Gülnihal-Köse-Rest-API-Gorevleri.md)
+4. [Şerife Nur Yılmaz'ın REST API Metotları](Şerife-Nur-Yılmaz/Şerife-Nur-Yılmaz-Rest-API-Gorevleri.md)
