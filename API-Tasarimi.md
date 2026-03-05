@@ -25,15 +25,11 @@ info:
     işlemler (ör. admin güncellemeleri) bu kapsamda değerlendirilir.
   contact:
     name: Meyran Proje Ekibi
-    email: proje@example.com
+    
 
 servers:
   - url: http://localhost:3000/v1
     description: Yerel geliştirme sunucusu
-  - url: https://api.yazmuh.com/v1
-    description: Üretim sunucusu
-  - url: https://staging-api.yazmuh.com/v1
-    description: Test (staging) sunucusu
 
 tags:
   - name: Kimlik Doğrulama
