@@ -209,36 +209,18 @@ router.get('/:productId/reviews', async (req, res) => {
       return res.status(404).json({ message: 'Ürün bulunamadı' });
     }
 
-    // Sıralama opsiyonu
-    const sortBy = req.query.sortBy === 'rating' ? 'rating' : 'createdAt';
-    const order = req.query.order === 'asc' ? 1 : -1;
-
-    const reviews = await Review.find({ productId: req.params.productId })
-      .populate('userId', 'ad soyad')
-      .sort({ [sortBy]: order });
-
-    // Ortalama puan hesaplama
-    const totalRating = reviews.reduce((sum: number, r: any) => sum + r.rating, 0);
-    const averageRating = reviews.length > 0 ? Math.round((totalRating / reviews.length) * 10) / 10 : 0;
+    const reviews = await Review.find({ productId: req.params.productId }).populate('userId', 'ad soyad');
     
-    res.json({
-      averageRating,
-      totalReviews: reviews.length,
-      reviews: reviews.map((review: any) => ({
-        id: review._id,
-        productId: review.productId,
-        userId: review.userId?._id,
-        userName: review.userId ? `${review.userId.ad} ${review.userId.soyad}` : 'Kullanıcı',
-        rating: review.rating,
-        comment: review.comment,
-        createdAt: review.createdAt
-      }))
-    });
-  } catch (error: any) {
-    console.error('Yorum listeleme hatası:', error);
-    if (error.name === 'CastError') {
-      return res.status(400).json({ message: 'Geçersiz ürün ID formatı' });
-    }
+    res.json(reviews.map((review: any) => ({
+      id: review._id,
+      productId: review.productId,
+      userId: review.userId?._id,
+      userName: review.userId ? `${review.userId.ad} ${review.userId.soyad}` : 'Kullanıcı',
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: review.createdAt
+    })));
+  } catch (error) {
     res.status(500).json({ message: 'Sunucu hatası' });
   }
 });
@@ -292,9 +274,8 @@ router.put('/:productId/reviews/:reviewId', authenticate, async (req: AuthReques
       return res.status(404).json({ message: 'Yorum bulunamadı' });
     }
 
-    // Sadece yorum sahibi güncelleyebilir
-    if (review.userId.toString() !== req.user?.userId) {
-      return res.status(403).json({ message: 'Bu yorumu sadece yorum sahibi güncelleyebilir' });
+    if (review.userId.toString() !== req.user?.userId && req.user?.role !== 'admin') {
+      return res.status(401).json({ message: 'Kimlik doğrulama başarısız' });
     }
 
     if (rating) review.rating = rating;
@@ -302,18 +283,12 @@ router.put('/:productId/reviews/:reviewId', authenticate, async (req: AuthReques
 
     await review.save();
 
-    // Ortalama puanı yeniden hesapla
-    const allReviews = await Review.find({ productId: req.params.productId });
-    const totalRating = allReviews.reduce((sum, r: any) => sum + r.rating, 0);
-    const averageRating = allReviews.length > 0 ? Math.round((totalRating / allReviews.length) * 10) / 10 : 0;
-
     res.json({
       id: review._id,
       productId: review.productId,
       rating: review.rating,
       comment: review.comment,
-      createdAt: review.createdAt,
-      averageRating
+      createdAt: review.createdAt
     });
   } catch (error) {
     res.status(400).json({ message: 'Geçersiz istek verisi' });
