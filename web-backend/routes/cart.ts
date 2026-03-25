@@ -8,7 +8,7 @@ const router = express.Router();
 // GET /cart
 router.get('/', authenticate, async (req: AuthRequest, res) => {
   try {
-    let cart = await Cart.findOne({ userId: req.user?.userId });
+    let cart = await Cart.findOne({ userId: req.user?.userId }).populate('items.productId', 'name imageUrl');
     
     if (!cart) {
       cart = new Cart({ userId: req.user?.userId, items: [], total: 0 });
@@ -16,11 +16,14 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
     }
 
     res.json({
-      items: cart.items.map(item => ({
+      items: cart.items.map((item: any) => ({
         itemId: item._id,
-        productId: item.productId,
+        productId: item.productId?._id || item.productId,
+        name: item.productId?.name || '',
+        imageUrl: item.productId?.imageUrl || '',
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        subtotal: item.quantity * item.price
       })),
       total: cart.total
     });
@@ -50,6 +53,12 @@ router.post('/items', authenticate, async (req: AuthRequest, res) => {
 
     const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
 
+    // Stok kontrolü
+    const currentQuantity = existingItemIndex > -1 ? cart.items[existingItemIndex].quantity : 0;
+    if (currentQuantity + quantity > product.stock) {
+      return res.status(409).json({ message: 'Stok yetersiz. Mevcut stok: ' + product.stock });
+    }
+
     if (existingItemIndex > -1) {
       cart.items[existingItemIndex].quantity += quantity;
     } else {
@@ -73,8 +82,7 @@ router.post('/items', authenticate, async (req: AuthRequest, res) => {
       total: cart.total
     });
   } catch (error) {
-    console.error('Sepete ekleme hatası:', error);
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(400).json({ message: 'Geçersiz istek verisi' });
   }
 });
 
@@ -97,6 +105,15 @@ router.put('/items/:itemId', authenticate, async (req: AuthRequest, res) => {
       return res.status(404).json({ message: 'Sepet kalemi bulunamadı' });
     }
 
+    // Stok kontrolü
+    const product = await Product.findById(cart.items[itemIndex].productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Ürün bulunamadı' });
+    }
+    if (quantity > product.stock) {
+      return res.status(409).json({ message: 'Stok yetersiz. Mevcut stok: ' + product.stock });
+    }
+
     cart.items[itemIndex].quantity = quantity;
     cart.total = cart.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
     
@@ -112,8 +129,7 @@ router.put('/items/:itemId', authenticate, async (req: AuthRequest, res) => {
       total: cart.total
     });
   } catch (error) {
-    console.error('Sepet güncelleme hatası:', error);
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(400).json({ message: 'Geçersiz istek verisi' });
   }
 });
 
