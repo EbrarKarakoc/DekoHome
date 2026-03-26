@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 .DS_Store
-=======
 # Logs
 logs
 *.log
@@ -140,4 +138,3 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
->>>>>>> 6415f27300a1bf708982c5e0444197054fc366c1
