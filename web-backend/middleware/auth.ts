@@ -32,7 +32,8 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Geçersiz token' });
+    console.error('❌ Auth error:', error);
+    res.status(401).json({ message: 'Geçersiz veya süresi dolmuş oturum' });
   }
 };
 

@@ -84,41 +84,7 @@ router.get('/seed', async (req, res) => {
   }
 });
 
-// POST /products
-router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
-  try {
-    const { name, price, description, stock, categoryId, imageUrl } = req.body;
-
-    if (!name || !price || !stock || !categoryId) {
-      return res.status(400).json({ message: 'Eksik alanlar var' });
-    }
-
-    const product = new Product({
-      name,
-      price,
-      description,
-      stock,
-      categoryId,
-      imageUrl
-    });
-
-    await product.save();
-
-    res.status(201).json({
-      id: product._id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      categoryId: product.categoryId,
-      imageUrl: product.imageUrl
-    });
-  } catch (error) {
-    res.status(400).json({ message: 'Geçersiz istek verisi' });
-  }
-});
-
-// POST /products
+// POST /products - Create a new product (Admin only)
 router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
   try {
     const { name, price, description, stock, categoryId, imageUrl } = req.body;
@@ -137,9 +103,19 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
     });
 
     await product.save();
-    res.status(201).json(product);
-  } catch (error) {
-    res.status(400).json({ message: 'Ürün oluşturulamadı' });
+    
+    res.status(201).json({
+      id: product._id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      categoryId: product.categoryId,
+      imageUrl: product.imageUrl
+    });
+  } catch (error: any) {
+    console.error('❌ POST /products error:', error);
+    res.status(400).json({ message: 'Ürün oluşturulamadı', error: error.message });
   }
 });
 
