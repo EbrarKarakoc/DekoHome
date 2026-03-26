@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import Review from '../models/Review.js';
+import Order from '../models/Order.js';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -119,7 +120,7 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
 // GET /products
 router.get('/', async (req, res) => {
   try {
-    const { q, categoryId, minPrice, maxPrice } = req.query;
+    const { q, categoryId, minPrice, maxPrice, page = '1', limit = '10' } = req.query;
     
     let query: any = {};
     
@@ -140,9 +141,18 @@ router.get('/', async (req, res) => {
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
 
-    const products = await Product.find(query).populate('categoryId', 'name');
+    const pageNumber = parseInt(page as string, 10);
+    const limitNumber = parseInt(limit as string, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .populate('categoryId', 'name')
+      .skip(skip)
+      .limit(limitNumber);
     
-    res.json(products.map((product: any) => ({
+    res.json({
+      products: products.map((product: any) => ({
       id: product._id,
       name: product.name,
       description: product.description,
@@ -151,7 +161,14 @@ router.get('/', async (req, res) => {
       categoryId: product.categoryId?._id,
       category: product.categoryId?.name || '',
       imageUrl: product.imageUrl
-    })));
+      })),
+      pagination: {
+        total,
+        page: pageNumber,
+        pages: Math.ceil(total / limitNumber),
+        limit: limitNumber
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Sunucu hatası' });
   }
@@ -189,7 +206,19 @@ router.put('/:productId', authenticate, requireAdmin, async (req: AuthRequest, r
 // DELETE /products/:productId
 router.delete('/:productId', authenticate, requireAdmin, async (req: AuthRequest, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.productId);
+    const productId = req.params.productId;
+
+    // Aktif bir siparişte bu ürün var mı kontrol et
+    const activeOrder = await Order.findOne({
+      'items.productId': productId,
+      status: { $in: ['Hazırlanıyor', 'Kargoya Verildi'] }
+    });
+
+    if (activeOrder) {
+      return res.status(400).json({ message: 'Sistem Uyarısı: Bu ürün aktif bir siparişte yer aldığı için silinemez!' });
+    }
+
+    const product = await Product.findByIdAndDelete(productId);
     
     if (!product) {
       return res.status(404).json({ message: 'Ürün bulunamadı' });
