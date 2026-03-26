@@ -24,7 +24,14 @@ async function startServer() {
   const PORT = parseInt(process.env.PORT || "3000", 10);
 
   // Middleware
-  app.use(cors());
+  app.use(cors({
+    origin: [
+      'https://dekohome-api.onrender.com',
+      'http://localhost:3000',
+      'http://localhost:24679',
+    ],
+    credentials: true,
+  }));
   app.use(express.json());
 
   // API Routes
