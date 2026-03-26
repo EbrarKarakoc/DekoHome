@@ -1,7 +1,7 @@
 import express from 'express';
 import Order from '../models/Order.js';
 import Cart from '../models/Cart.js';
-import Product from '../models/Product.js';
+import Product from '../models/Product.ts';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth.js';
 
 const router = express.Router();
