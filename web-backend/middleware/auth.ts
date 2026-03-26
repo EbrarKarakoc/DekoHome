@@ -15,7 +15,12 @@ export type AuthRequest = Request & {
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const authHeader = (req as any).headers?.authorization || (req as any).header?.('Authorization');
-  const token = typeof authHeader === 'string' ? authHeader.replace('Bearer ', '') : undefined;
+  let token = typeof authHeader === 'string' ? authHeader.replace('Bearer ', '') : undefined;
+
+  // Browser'dan direkt linkle test etmek için query parameter desteği ekleyelim
+  if (!token && req.query.token) {
+    token = req.query.token as string;
+  }
 
   if (!token) {
     res.status(401).json({ message: 'Kimlik doğrulama başarısız' });

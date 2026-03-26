@@ -72,12 +72,17 @@ router.post('/items', authenticate, async (req: AuthRequest, res) => {
     cart.total = cart.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
     await cart.save();
 
+    const populatedCart = await Cart.findById(cart._id).populate('items.productId', 'name imageUrl');
+
     res.status(201).json({
-      items: cart.items.map(item => ({
+      items: (populatedCart as any).items.map((item: any) => ({
         itemId: item._id,
-        productId: item.productId,
+        productId: item.productId?._id || item.productId,
+        name: item.productId?.name || '',
+        imageUrl: item.productId?.imageUrl || '',
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        subtotal: item.quantity * item.price
       })),
       total: cart.total
     });
@@ -119,12 +124,17 @@ router.put('/items/:itemId', authenticate, async (req: AuthRequest, res) => {
     
     await cart.save();
 
+    const populatedCart = await Cart.findById(cart._id).populate('items.productId', 'name imageUrl');
+
     res.json({
-      items: cart.items.map(item => ({
+      items: (populatedCart as any).items.map((item: any) => ({
         itemId: item._id,
-        productId: item.productId,
+        productId: item.productId?._id || item.productId,
+        name: item.productId?.name || '',
+        imageUrl: item.productId?.imageUrl || '',
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        subtotal: item.quantity * item.price
       })),
       total: cart.total
     });

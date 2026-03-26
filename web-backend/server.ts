@@ -30,8 +30,8 @@ async function startServer() {
   // API Routes
   app.get("/v1/health", (req, res) => {
     const uri = process.env.MONGODB_URI || '';
-    res.json({ 
-      status: "ok", 
+    res.json({
+      status: "ok",
       message: "DekoHome Backend API is running!",
       dbState: mongoose.connection.readyState,
       hasUri: !!uri,
