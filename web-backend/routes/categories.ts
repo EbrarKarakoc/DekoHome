@@ -7,13 +7,28 @@ const router = express.Router();
 // GET /categories
 router.get('/', async (req, res) => {
   try {
-    const categories = await Category.find();
-    res.json(categories.map(cat => ({
-      id: cat._id,
-      name: cat.name,
-      description: cat.description,
-      parentCategoryId: cat.parentCategoryId
-    })));
+    const categories = await Category.find().lean();
+    
+    // Ağaç yapısını oluşturmak için yardımcı fonksiyon
+    const buildTree = (cats: any[], parentId: string | null = null): any[] => {
+      return cats
+        .filter(cat => {
+          if (parentId === null) {
+            return !cat.parentCategoryId;
+          }
+          return cat.parentCategoryId?.toString() === parentId.toString();
+        })
+        .map(cat => ({
+          id: cat._id,
+          name: cat.name,
+          description: cat.description,
+          parentCategoryId: cat.parentCategoryId,
+          children: buildTree(cats, cat._id.toString())
+        }));
+    };
+
+    const tree = buildTree(categories);
+    res.json(tree);
   } catch (error) {
     res.status(500).json({ message: 'Sunucu hatası' });
   }

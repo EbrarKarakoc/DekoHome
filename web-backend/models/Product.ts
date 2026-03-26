@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Lütfen ürün adı giriniz'],
+    required: true,
     trim: true,
   },
   price: {
@@ -17,23 +17,11 @@ const productSchema = new mongoose.Schema({
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
-    required: [true, 'Lütfen kategori seçiniz'],
+    required: true,
   },
   imageUrl: {
     type: String,
-    default: 'https://picsum.photos/seed/furniture/400/400',
-  },
-  stock: {
-    type: Number,
-    default: 10,
-  },
-  ratings: {
-    type: Number,
-    default: 0,
-  },
-  numReviews: {
-    type: Number,
-    default: 0,
+    required: true,
   }
 }, {
   timestamps: true
