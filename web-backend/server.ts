@@ -7,10 +7,8 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import productRoutes from "./routes/products.js";
 import userRoutes from "./routes/users.js";
-import categoryRoutes from "./routes/categories.js";
 import cartRoutes from "./routes/cart.js";
 import orderRoutes from "./routes/orders.js";
-import reviewRoutes from "./routes/reviews.js";
 import { connectDB } from "./config/db.js";
 
 // Load environment variables
@@ -41,11 +39,9 @@ async function startServer() {
 
   app.use("/v1/auth", authRoutes);
   app.use("/v1/users", userRoutes);
-  app.use("/v1/categories", categoryRoutes);
   app.use("/v1/products", productRoutes);
   app.use("/v1/cart", cartRoutes);
   app.use("/v1/orders", orderRoutes);
-  app.use("/v1/reviews", reviewRoutes);
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
