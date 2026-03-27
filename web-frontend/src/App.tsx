@@ -22,6 +22,30 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const getIcon = (item: string) => {
+  // item can be an icon name or a category name
+  const nameToIcon: {[key: string]: string} = {
+    'Oturma Odası': 'Sofa',
+    'Yatak Odası': 'Bed',
+    'Mutfak': 'Utensils',
+    'Ofis': 'Briefcase',
+    'Depolama': 'Package',
+    'Dekorasyon': 'Sparkles'
+  };
+  
+  const iconName = nameToIcon[item] || item;
+
+  switch (iconName) {
+    case 'Sofa': return <Sofa className="w-8 h-8 transition-colors" />;
+    case 'Bed': return <Bed className="w-8 h-8 transition-colors" />;
+    case 'Utensils': return <Utensils className="w-8 h-8 transition-colors" />;
+    case 'Briefcase': return <Briefcase className="w-8 h-8 transition-colors" />;
+    case 'Package': return <Package className="w-8 h-8 transition-colors" />;
+    case 'Sparkles': return <Sparkles className="w-8 h-8 transition-colors" />;
+    default: return <Package className="w-8 h-8 transition-colors" />;
+  }
+};
+
 // --- Types ---
 interface Product {
   _id?: string;
@@ -30,7 +54,15 @@ interface Product {
   price: number;
   desc: string;
   category: string;
+  categoryId?: string;
   imageUrl: string;
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  description?: string;
+  children?: Category[];
 }
 
 // --- Toast Context ---
@@ -175,7 +207,19 @@ const Header = () => {
             <h2 className="text-xl font-extrabold tracking-tight text-slate-900">DekoHome</h2>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <Link to="/categories" className="text-sm font-medium hover:text-yellow-600 transition-colors">Kategoriler</Link>
+            <div className="relative group">
+              <Link to="/categories" className="text-sm font-medium hover:text-yellow-600 transition-colors flex items-center gap-1">
+                Kategoriler <ChevronRight className="w-4 h-4 rotate-90" />
+              </Link>
+              {/* Dropdown Menu for Categories */}
+              <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[60] overflow-hidden">
+                <div className="py-2">
+                  <Link to="/categories" className="block px-4 py-2 text-sm font-bold text-yellow-600 hover:bg-yellow-50">Tümünü Gör</Link>
+                  <div className="h-px bg-slate-100 my-1"></div>
+                  <CategoryDropdownItems />
+                </div>
+              </div>
+            </div>
             <Link to="/cart" className="relative group text-sm font-medium hover:text-yellow-600 transition-colors flex items-center gap-1.5">
               <div className="relative">
                 <ShoppingBag className="w-5 h-5 text-slate-700 group-hover:text-yellow-600 transition-colors" />
@@ -401,21 +445,9 @@ const HomePage = () => {
   useEffect(() => {
     fetch('/v1/categories')
       .then(res => res.json())
-      .then(data => setCategories(data))
+      .then(data => setCategories(Array.isArray(data) ? data : (data.data || [])))
       .catch(e => console.error(e));
   }, []);
-
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Sofa': return <Sofa className="w-8 h-8 transition-colors" />;
-      case 'Bed': return <Bed className="w-8 h-8 transition-colors" />;
-      case 'Utensils': return <Utensils className="w-8 h-8 transition-colors" />;
-      case 'Briefcase': return <Briefcase className="w-8 h-8 transition-colors" />;
-      case 'Package': return <Package className="w-8 h-8 transition-colors" />;
-      case 'Sparkles': return <Sparkles className="w-8 h-8 transition-colors" />;
-      default: return <Package className="w-8 h-8 transition-colors" />;
-    }
-  };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
@@ -434,21 +466,32 @@ const HomePage = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6 border-t border-slate-100 pt-8">
-          {[
-            { name: 'Oturma Odası', icon: <Sofa className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Yatak Odası', icon: <Bed className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Mutfak', icon: <Utensils className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Ofis', icon: <Briefcase className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Depolama', icon: <Package className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Dekorasyon', icon: <Sparkles className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> }
-          ].map((cat) => (
-            <Link to="/categories" key={cat.name} className="group flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-transparent hover:border-yellow-100 cursor-pointer">
-              <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
-                {cat.icon}
-              </div>
-              <span className="font-bold text-slate-900 text-center tracking-tight">{cat.name}</span>
-            </Link>
-          ))}
+          {categories.length > 0 ? (
+            categories.slice(0, 6).map((cat) => (
+              <Link to="/categories" key={cat._id} className="group flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-transparent hover:border-yellow-100 cursor-pointer">
+                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
+                  {getIcon(cat.name)}
+                </div>
+                <span className="font-bold text-slate-900 text-center tracking-tight">{cat.name}</span>
+              </Link>
+            ))
+          ) : (
+            [
+              { name: 'Oturma Odası', icon: <Sofa className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
+              { name: 'Yatak Odası', icon: <Bed className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
+              { name: 'Mutfak', icon: <Utensils className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
+              { name: 'Ofis', icon: <Briefcase className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
+              { name: 'Depolama', icon: <Package className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
+              { name: 'Dekorasyon', icon: <Sparkles className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> }
+            ].map((cat) => (
+              <Link to="/categories" key={cat.name} className="group flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-transparent hover:border-yellow-100 cursor-pointer">
+                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
+                  {cat.icon}
+                </div>
+                <span className="font-bold text-slate-900 text-center tracking-tight">{cat.name}</span>
+              </Link>
+            ))
+          )}
         </div>
       </section>
 
@@ -497,15 +540,115 @@ const HomePage = () => {
   );
 };
 
+const CategoryTreeItem = ({ cat, level = 0, selectedIds, onToggle, products }: any) => {
+  const isSelected = selectedIds.includes(cat._id);
+  const [isOpen, setIsOpen] = useState(true);
+  const hasChildren = cat.children && cat.children.length > 0;
+  
+  // Count products in this category and all its children
+  const getProductCount = (category: any): number => {
+    let count = products.filter((p: any) => 
+      String(p.categoryId) === String(category._id) || 
+      p.category === category.name
+    ).length;
+    if (category.children) {
+      category.children.forEach((child: any) => {
+        count += getProductCount(child);
+      });
+    }
+    return count;
+  };
+
+  const totalProducts = getProductCount(cat);
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center group">
+        <button 
+          onClick={() => onToggle(cat._id)}
+          className={cn(
+            "flex-1 flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all text-left",
+            isSelected ? "bg-yellow-50 text-yellow-700 font-bold" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          )}
+          style={{ paddingLeft: `${(level * 12) + 12}px` }}
+        >
+          <span className="truncate">{cat.name}</span>
+          <span className="text-[10px] text-slate-400 group-hover:text-slate-500 font-medium bg-slate-100 px-1.5 py-0.5 rounded-full">{totalProducts}</span>
+        </button>
+        {hasChildren && (
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 text-slate-400 hover:text-yellow-600 transition-colors"
+          >
+            <ChevronRight className={cn("w-3 h-3 transition-transform", isOpen && "rotate-90")} />
+          </button>
+        )}
+      </div>
+      {hasChildren && isOpen && (
+        <div className="flex flex-col">
+          {cat.children.map((child: any) => (
+            <CategoryTreeItem 
+              key={child._id} 
+              cat={child} 
+              level={level + 1} 
+              selectedIds={selectedIds} 
+              onToggle={onToggle}
+              products={products}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const CategoryDropdownItems = () => {
+  const [cats, setCats] = useState<Category[]>([]);
+  useEffect(() => {
+    fetch('/v1/categories').then(r => r.json()).then(data => setCats(Array.isArray(data) ? data : []));
+  }, []);
+
+  const renderItems = (items: Category[], level = 0) => {
+    return items.map(cat => (
+      <div key={cat._id}>
+        <Link 
+          to="/categories" 
+          onClick={() => {
+            // Highlight this category when navigating
+            localStorage.setItem('selectedCategory', cat._id);
+            window.dispatchEvent(new Event('categorySelect'));
+          }}
+          className={cn(
+            "block px-4 py-2 text-sm text-slate-600 hover:bg-yellow-50 hover:text-yellow-700 transition-colors",
+            level > 0 && "pl-8 text-xs italic"
+          )}
+        >
+          {cat.name}
+        </Link>
+        {cat.children && cat.children.length > 0 && renderItems(cat.children, level + 1)}
+      </div>
+    ));
+  };
+
+  return <>{renderItems(cats.slice(0, 8))}</>;
+};
+
 const CategoriesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch Categories
+    fetch('/v1/categories')
+      .then(res => res.json())
+      .then(data => setCategories(Array.isArray(data) ? data : (data.data || [])))
+      .catch(e => console.error('Kategoriler çekilemedi:', e));
+
     fetch('/v1/products')
       .then(async res => {
         if (!res.ok) throw new Error(`Sunucu hatası: ${res.status}`);
@@ -557,28 +700,64 @@ const CategoriesPage = () => {
     }
   };
 
-  const categories = [
-    { name: 'Oturma Odası', icon: <Sofa className="w-8 h-8 text-slate-700" /> },
-    { name: 'Yatak Odası', icon: <Bed className="w-8 h-8 text-slate-700" /> },
-    { name: 'Mutfak', icon: <Utensils className="w-8 h-8 text-slate-700" /> },
-    { name: 'Ofis', icon: <Briefcase className="w-8 h-8 text-slate-700" /> },
-    { name: 'Depolama', icon: <Package className="w-8 h-8 text-slate-700" /> },
-    { name: 'Dekorasyon', icon: <Sparkles className="w-8 h-8 text-slate-700" /> }
-  ];
-
-  const toggleCategory = (catName: string) => {
-    setSelectedCategories(prev =>
-      prev.includes(catName)
-        ? prev.filter(c => c !== catName)
-        : [...prev, catName]
+  const toggleCategory = (catId: string) => {
+    setSelectedCategoryIds(prev =>
+      prev.includes(catId)
+        ? prev.filter(c => c !== catId)
+        : [...prev, catId]
     );
   };
 
+  useEffect(() => {
+    const handleCategorySelect = () => {
+      const selected = localStorage.getItem('selectedCategory');
+      if (selected) {
+        setSelectedCategoryIds([selected]);
+        localStorage.removeItem('selectedCategory');
+      }
+    };
+    window.addEventListener('categorySelect', handleCategorySelect);
+    handleCategorySelect();
+    return () => window.removeEventListener('categorySelect', handleCategorySelect);
+  }, []);
+
   const filteredProducts = allProducts.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.desc.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
-    return matchesSearch && matchesCategory;
+    const searchLow = searchQuery.toLowerCase();
+    const nameMatch = (product.name || '').toLowerCase().includes(searchLow);
+    const descMatch = (product.description || product.desc || '').toLowerCase().includes(searchLow);
+    const matchesSearch = nameMatch || descMatch;
+    
+    if (selectedCategoryIds.length === 0) return matchesSearch;
+
+    // Direct match with IDs or names
+    const directMatch = selectedCategoryIds.some(id => 
+      String(product.categoryId) === String(id) || 
+      product.category === id
+    );
+    
+    if (directMatch) return matchesSearch;
+
+    // Check if product belongs to a subcategory of any selected category
+    const isInCategoryHierarchy = (cats: Category[], targetIds: string[]): boolean => {
+      for (const cat of cats) {
+        if (targetIds.includes(String(cat._id)) || targetIds.includes(cat.name)) {
+          // If this category is selected, check if product is here or in any child
+          const getAllChildIds = (c: Category): string[] => {
+            let ids = [String(c._id)];
+            c.children?.forEach(child => {
+              ids = [...ids, ...getAllChildIds(child)];
+            });
+            return ids;
+          };
+          
+          if (getAllChildIds(cat).includes(String(product.categoryId))) return true;
+        }
+        if (cat.children && isInCategoryHierarchy(cat.children, targetIds)) return true;
+      }
+      return false;
+    };
+
+    return matchesSearch && isInCategoryHierarchy(categories, selectedCategoryIds);
   });
 
   return (
@@ -596,153 +775,168 @@ const CategoriesPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
-        {categories.map((cat, i) => {
-          const isSelected = selectedCategories.includes(cat.name);
-          return (
-            <button
-              key={i}
-              onClick={() => toggleCategory(cat.name)}
-              className={cn(
-                "group flex flex-col items-center justify-center gap-4 rounded-2xl p-6 transition-all duration-300 border",
-                isSelected 
-                  ? "bg-yellow-600 border-yellow-600 shadow-xl shadow-yellow-600/20 -translate-y-1" 
-                  : "bg-white border-slate-100 hover:border-yellow-200 hover:shadow-lg"
+      <div className="flex flex-col lg:flex-row gap-8 mb-24">
+        {/* Sidebar - Category Tree */}
+        <aside className="w-full lg:w-72 flex-shrink-0">
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 sticky top-24">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-slate-900">Kategoriler</h3>
+              {selectedCategoryIds.length > 0 && (
+                <button onClick={() => setSelectedCategoryIds([])} className="text-xs text-yellow-600 hover:text-yellow-700 font-bold">Temizle</button>
               )}
-            >
-              <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-                isSelected ? "bg-white/20 text-white" : "bg-slate-50 text-slate-700 group-hover:bg-yellow-50"
-              )}>
-                {getIcon(cat.icon || 'Package', isSelected)}
+            </div>
+            
+            <div className="space-y-1">
+              {categories.map(cat => (
+                <CategoryTreeItem 
+                  key={cat._id} 
+                  cat={cat} 
+                  selectedIds={selectedCategoryIds} 
+                  onToggle={toggleCategory} 
+                  products={allProducts}
+                />
+              ))}
+            </div>
+
+            <div className="mt-8 border-t border-slate-50 pt-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input 
+                  type="text" 
+                  placeholder="Ürün ara..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                />
               </div>
-              <span className={cn(
-                "font-bold text-sm tracking-tight",
-                isSelected ? "text-white" : "text-slate-900"
-              )}>{cat.name}</span>
-            </button>
-          )
-        })}
-      </div>
+            </div>
+          </div>
+        </aside>
 
-      {(JSON.parse(localStorage.getItem('user') || '{}').role === 'admin') && (
-        <div className="mb-8 flex justify-end">
-          <button 
-            onClick={() => {
-              const name = prompt('Ürün Adı:');
-              const price = prompt('Fiyat:');
-              const desc = prompt('Açıklama:');
-              const category = prompt('Kategori (Oturma Odası, Yatak Odası, Mutfak, Ofis, Depolama, Dekorasyon):');
-              const imageUrl = prompt('Görsel URL (Boş bırakılabilir):');
-              
-              if (name && price && desc && category) {
-                 const token = localStorage.getItem('token');
-                 // First find categoryId
-                 fetch('/v1/categories').then(r => r.json()).then(cats => {
-                    const cat = cats.find((c: any) => c.name === category);
-                    if (!cat) { alert('Hatalı kategori ismi!'); return; }
-                    
-                    fetch('/v1/products', {
-                      method: 'POST',
-                      headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
-                      body: JSON.stringify({ name, price: Number(price), description: desc, categoryId: cat._id, imageUrl })
-                    }).then(res => {
-                      if (res.ok) {
-                        alert('Ürün başarıyla eklendi!');
-                        window.location.reload();
-                      } else {
-                        alert('Ekleme başarısız!');
-                      }
-                    });
-                 });
-              }
-            }}
-            className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg"
-          >
-            <Package className="w-5 h-5" /> Yeni Ürün Ekle (Admin)
-          </button>
-        </div>
-      )}
+        {/* Main Content - Product Grid */}
+        <div className="flex-1">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold font-serif text-slate-900">
+              {selectedCategoryIds.length > 0 
+                ? categories.flatMap(c => {
+                    const find = (cat: Category): string | null => {
+                      if (selectedCategoryIds.map(String).includes(String(cat._id)) || selectedCategoryIds.includes(cat.name)) return cat.name;
+                      return cat.children?.flatMap(find).find(n => n) || null;
+                    };
+                    return [find(c)];
+                  }).filter(Boolean).join(', ') 
+                : 'Tüm Ürünler'}
+            </h2>
+            <span className="text-slate-500 font-medium">{filteredProducts.length} Ürün Listeleniyor</span>
+          </div>
 
-      <div className="mb-8 flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-serif text-slate-900">
-          {selectedCategories.length > 0 ? selectedCategories.join(', ') : 'Tüm Ürünler'}
-        </h2>
-        <span className="text-slate-500 font-medium">{filteredProducts.length} Ürün</span>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="w-12 h-12 animate-spin text-yellow-600" />
-        </div>
-      ) : filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-24">
-          {filteredProducts.map((prod, i) => (
-            <Link to={`/product/${prod._id || prod.id}`} key={prod._id || prod.id} className="group relative flex flex-col">
-              <div className="aspect-[4/5] w-full overflow-hidden rounded-xl bg-slate-50 relative">
-                <img src={prod.imageUrl} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" referrerPolicy="no-referrer" />
-                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-slate-700 uppercase tracking-wider">
-                  {prod.category}
-                </div>
-              </div>
-              <div className="mt-4 flex flex-1 flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-yellow-600 transition-colors">{prod.name}</h3>
-                  <p className="mt-1 text-sm text-slate-500">{prod.desc}</p>
-                  <p className="mt-2 text-xl font-black text-slate-900">{prod.price.toLocaleString('tr-TR')} TL</p>
-                </div>
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleAddToCart(prod);
-                  }}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-slate-100 text-slate-900 py-3 text-sm font-bold hover:bg-yellow-600 hover:text-white transition-colors"
-                >
-                  <ShoppingBag className="w-5 h-5" /> Sepete Ekle
-                </button>
-                {(JSON.parse(localStorage.getItem('user') || '{}').role === 'admin') && (
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (window.confirm('Bu ürünü silmek istediğinize emin misiniz?')) {
-                        const token = localStorage.getItem('token');
-                        fetch(`/v1/products/${prod._id || prod.id}`, {
-                          method: 'DELETE',
-                          headers: {'Authorization': `Bearer ${token}`}
-                        }).then(res => {
-                          if (res.ok) {
-                            alert('Ürün silindi');
-                            window.location.reload();
-                          } else {
-                            res.json().then(d => alert(d.message || 'Silinemedi'));
+          {(JSON.parse(localStorage.getItem('user') || '{}').role === 'admin') && (
+            <div className="mb-6 flex justify-end">
+              <button 
+                onClick={() => {
+                  const name = prompt('Ürün Adı:');
+                  const price = prompt('Fiyat:');
+                  const desc = prompt('Açıklama:');
+                  const category = prompt('Kategori İsmi:');
+                  const stock = prompt('Stok Miktarı:', '10');
+                  const imageUrls = prompt('Görsel URL’leri (Virgül ile ayırın):');
+                  
+                  if (name && price && desc && category) {
+                    const token = localStorage.getItem('token');
+                    fetch('/v1/categories').then(r => r.json()).then(cats => {
+                      const findInTree = (items: Category[]): Category | undefined => {
+                        for (const c of items) {
+                          if (c.name === category) return c;
+                          if (c.children) {
+                            const found = findInTree(c.children);
+                            if (found) return found;
                           }
-                        });
-                      }
-                    }}
-                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-red-50 text-red-600 py-2 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100"
-                  >
-                    <Trash2 className="w-4 h-4" /> Ürünü Sil
-                  </button>
-                )}
-              </div>
-            </Link>
-          ))}
+                        }
+                      };
+                      const cat = findInTree(cats);
+                      if (!cat) { alert('Hatalı kategori ismi!'); return; }
+                      
+                      const images = imageUrls ? imageUrls.split(',').map(s => s.trim()) : [];
+
+                      fetch('/v1/products', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                        body: JSON.stringify({ 
+                          name, 
+                          price: Number(price), 
+                          description: desc, 
+                          categoryId: cat._id, 
+                          stock: Number(stock),
+                          images,
+                          imageUrl: images[0] || ''
+                        })
+                      }).then(res => {
+                        if (res.ok) {
+                          alert('Ürün başarıyla eklendi!');
+                          window.location.reload();
+                        } else {
+                          res.json().then(d => alert('Ekleme başarısız: ' + (d.message || 'Bilinmeyen hata')));
+                        }
+                      });
+                    });
+                  }
+                }}
+                className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg text-sm"
+              >
+                <Package className="w-4 h-4" /> Yeni Ürün Ekle (Admin)
+              </button>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-12 h-12 animate-spin text-yellow-600" />
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((prod) => (
+                <Link to={`/product/${prod._id || prod.id}`} key={prod._id || prod.id} className="group flex flex-col bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300">
+                  <div className="aspect-[4/5] w-full overflow-hidden relative">
+                    <img src={prod.imageUrl} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" referrerPolicy="no-referrer" />
+                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-slate-700 uppercase tracking-wider">
+                      {prod.category}
+                    </div>
+                  </div>
+                  <div className="p-5 flex flex-1 flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900 group-hover:text-yellow-600 transition-colors line-clamp-1">{prod.name}</h3>
+                      <p className="mt-1 text-sm text-slate-500 line-clamp-2 min-h-[40px]">{prod.desc}</p>
+                      <p className="mt-4 text-xl font-black text-slate-900">{prod.price.toLocaleString('tr-TR')} TL</p>
+                    </div>
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddToCart(prod);
+                      }}
+                      className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-white py-3 text-sm font-bold hover:bg-yellow-600 transition-colors shadow-lg shadow-slate-900/10"
+                    >
+                      <ShoppingBag className="w-5 h-5" /> Sepete Ekle
+                    </button>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+              <Search className="w-16 h-16 text-slate-200 mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Ürün bulunamadı</h3>
+              <p className="text-slate-500 text-center max-w-sm">Seçtiğiniz kriterlere uygun ürün bulamadık. Lütfen farklı kategoriler veya anahtar kelimeler deneyin.</p>
+              <button
+                onClick={() => { setSearchQuery(''); setSelectedCategoryIds([]); }}
+                className="mt-6 px-8 py-3 bg-yellow-600 text-white rounded-xl font-bold hover:bg-yellow-700 transition-colors shadow-lg shadow-yellow-600/20"
+              >
+                Filtreleri Temizle
+              </button>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-slate-100 mb-24">
-          <Search className="w-16 h-16 text-slate-200 mb-4" />
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Ürün bulunamadı</h3>
-          <p className="text-slate-500 text-center max-w-md">Arama kriterlerinize uygun ürün bulamadık. Lütfen farklı anahtar kelimeler deneyin veya filtreleri temizleyin.</p>
-          <button
-            onClick={() => { setSearchQuery(''); setSelectedCategories([]); }}
-            className="mt-6 px-6 py-2 bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition-colors"
-          >
-            Filtreleri Temizle
-          </button>
-        </div>
-      )}
+      </div>
     </motion.div>
   );
 };
@@ -932,10 +1126,10 @@ const ProductPage = () => {
 
         <div className="px-4">
           <h1 className="text-4xl font-serif text-slate-900 mb-2">{product.name}</h1>
-          <p className="text-2xl font-medium text-stone-900 mb-6">{product.price.toLocaleString('tr-TR')} TL</p>
+          <p className="text-2xl font-medium text-stone-900 mb-6">{(product.price || 0).toLocaleString('tr-TR')} TL</p>
           <div className="space-y-6 text-stone-700">
             <p className="leading-relaxed">
-              {product.desc}
+              {product.description || product.desc}
             </p>
             <div className="border-t border-stone-200 pt-6">
               <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Ürün Özellikleri</h3>

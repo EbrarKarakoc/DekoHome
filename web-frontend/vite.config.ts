@@ -17,7 +17,10 @@ export default defineConfig(({mode}) => {
     },
     server: {
       allowedHosts: true,
-      hmr: process.env.DISABLE_HMR !== 'true',
+      hmr: {
+        protocol: 'ws',
+        port: 24680,
+      },
       port: 24679,
     },
   };
