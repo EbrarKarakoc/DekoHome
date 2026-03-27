@@ -396,6 +396,27 @@ const HomePage = () => {
     }
   };
 
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/v1/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(e => console.error(e));
+  }, []);
+
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Sofa': return <Sofa className="w-8 h-8 transition-colors" />;
+      case 'Bed': return <Bed className="w-8 h-8 transition-colors" />;
+      case 'Utensils': return <Utensils className="w-8 h-8 transition-colors" />;
+      case 'Briefcase': return <Briefcase className="w-8 h-8 transition-colors" />;
+      case 'Package': return <Package className="w-8 h-8 transition-colors" />;
+      case 'Sparkles': return <Sparkles className="w-8 h-8 transition-colors" />;
+      default: return <Package className="w-8 h-8 transition-colors" />;
+    }
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
       <section className="px-6 py-6 lg:px-10 max-w-7xl mx-auto">
@@ -593,9 +614,7 @@ const CategoriesPage = () => {
                 "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
                 isSelected ? "bg-white/20 text-white" : "bg-slate-50 text-slate-700 group-hover:bg-yellow-50"
               )}>
-                {React.cloneElement(cat.icon as React.ReactElement, { 
-                  className: cn("w-6 h-6", isSelected ? "text-white" : "text-slate-700") 
-                })}
+                {getIcon(cat.icon || 'Package', isSelected)}
               </div>
               <span className={cn(
                 "font-bold text-sm tracking-tight",
