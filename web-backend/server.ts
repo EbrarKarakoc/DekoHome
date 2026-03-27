@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { createServer as createViteServer } from "vite";
+// Removed static Vite import for production stability
 import path from "path";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
@@ -24,14 +24,21 @@ async function startServer() {
   const PORT = parseInt(process.env.PORT || "3000", 10);
 
   // Middleware
-  app.use(cors());
+  app.use(cors({
+    origin: [
+      'https://dekohome-api.onrender.com',
+      'http://localhost:3000',
+      'http://localhost:24679',
+    ],
+    credentials: true,
+  }));
   app.use(express.json());
 
   // API Routes
   app.get("/v1/health", (req, res) => {
     const uri = process.env.MONGODB_URI || '';
-    res.json({ 
-      status: "ok", 
+    res.json({
+      status: "ok",
       message: "DekoHome Backend API is running!",
       dbState: mongoose.connection.readyState,
       hasUri: !!uri,
@@ -49,12 +56,20 @@ async function startServer() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-      root: path.join(process.cwd(), "web-frontend"),
-    });
-    app.use(vite.middlewares);
+    try {
+      const { createServer: createViteServer } = await import("vite");
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+        root: path.join(process.cwd(), "web-frontend"),
+      });
+      app.use(vite.middlewares);
+      console.log("✅ Vite dev server started.");
+    } catch (err) {
+      console.error("❌ Vite server error:", err);
+      // In dev we might want to continue if frontend is not needed, but here we exit
+      process.exit(1);
+    }
   } else {
     // Serve static files in production
     const distPath = path.join(process.cwd(), 'web-frontend', 'dist');

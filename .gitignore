@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 .DS_Store
-=======
 # Logs
 logs
 *.log
@@ -42,6 +40,7 @@ build/Release
 
 # Dependency directories
 node_modules/
+package-lock.json
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
@@ -140,4 +139,3 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
->>>>>>> 6415f27300a1bf708982c5e0444197054fc366c1

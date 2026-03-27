@@ -21,7 +21,7 @@ const productSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    default: 'https://picsum.photos/seed/furniture/400/400',
+    default: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=400&q=80',
   },
   stock: {
     type: Number,

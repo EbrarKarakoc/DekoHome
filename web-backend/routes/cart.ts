@@ -28,6 +28,7 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
       total: cart.total
     });
   } catch (error) {
+    console.error('❌ GET /cart error:', error);
     res.status(500).json({ message: 'Sunucu hatası' });
   }
 });
@@ -72,17 +73,34 @@ router.post('/items', authenticate, async (req: AuthRequest, res) => {
     cart.total = cart.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
     await cart.save();
 
+    const populatedCart = await Cart.findById(cart._id).populate('items.productId', 'name imageUrl');
+
     res.status(201).json({
-      items: cart.items.map(item => ({
+      items: (populatedCart as any).items.map((item: any) => ({
         itemId: item._id,
-        productId: item.productId,
+        productId: item.productId?._id || item.productId,
+        name: item.productId?.name || 'Bilinmeyen Ürün',
+        imageUrl: item.productId?.imageUrl || '',
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        subtotal: item.quantity * item.price
       })),
       total: cart.total
     });
-  } catch (error) {
-    res.status(400).json({ message: 'Geçersiz istek verisi' });
+  } catch (error: any) {
+    console.error('❌ POST /cart/items error:', error);
+    
+    // Mongoose CastError (invalid ID)
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Geçersiz ürün ID formatı' });
+    }
+    
+    // Mongoose ValidationError
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Veri doğrulama hatası: ' + error.message });
+    }
+
+    res.status(500).json({ message: 'Sepete eklenirken sunucu hatası oluştu', error: error.message });
   }
 });
 
@@ -119,17 +137,23 @@ router.put('/items/:itemId', authenticate, async (req: AuthRequest, res) => {
     
     await cart.save();
 
+    const populatedCart = await Cart.findById(cart._id).populate('items.productId', 'name imageUrl');
+
     res.json({
-      items: cart.items.map(item => ({
+      items: (populatedCart as any).items.map((item: any) => ({
         itemId: item._id,
-        productId: item.productId,
+        productId: item.productId?._id || item.productId,
+        name: item.productId?.name || 'Bilinmeyen Ürün',
+        imageUrl: item.productId?.imageUrl || '',
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        subtotal: item.quantity * item.price
       })),
       total: cart.total
     });
-  } catch (error) {
-    res.status(400).json({ message: 'Geçersiz istek verisi' });
+  } catch (error: any) {
+    console.error('❌ PUT /cart/items error:', error);
+    res.status(400).json({ message: 'Miktar güncellenirken hata oluştu', error: error.message });
   }
 });
 
