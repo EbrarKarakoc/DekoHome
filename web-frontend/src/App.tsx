@@ -347,7 +347,7 @@ const HomePage = () => {
         return res.json();
       })
       .then(data => {
-        const products = Array.isArray(data) ? data : (data.data || []);
+        const products = Array.isArray(data) ? data : (data.products || data.data || []);
         setFeaturedProducts(products.slice(0, 4));
       })
       .catch(err => {
@@ -396,6 +396,27 @@ const HomePage = () => {
     }
   };
 
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/v1/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(e => console.error(e));
+  }, []);
+
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Sofa': return <Sofa className="w-8 h-8 transition-colors" />;
+      case 'Bed': return <Bed className="w-8 h-8 transition-colors" />;
+      case 'Utensils': return <Utensils className="w-8 h-8 transition-colors" />;
+      case 'Briefcase': return <Briefcase className="w-8 h-8 transition-colors" />;
+      case 'Package': return <Package className="w-8 h-8 transition-colors" />;
+      case 'Sparkles': return <Sparkles className="w-8 h-8 transition-colors" />;
+      default: return <Package className="w-8 h-8 transition-colors" />;
+    }
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
       <section className="px-6 py-6 lg:px-10 max-w-7xl mx-auto">
@@ -413,17 +434,10 @@ const HomePage = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6 border-t border-slate-100 pt-8">
-          {[
-            { name: 'Oturma Odası', icon: <Sofa className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Yatak Odası', icon: <Bed className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Mutfak', icon: <Utensils className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Ofis', icon: <Briefcase className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Depolama', icon: <Package className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> },
-            { name: 'Aksesuar', icon: <Sparkles className="w-8 h-8 group-hover:text-yellow-600 transition-colors" /> }
-          ].map((cat) => (
-            <Link to="/categories" key={cat.name} className="group flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-transparent hover:border-yellow-100 cursor-pointer">
-              <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
-                {cat.icon}
+          {categories.map((cat) => (
+            <Link to="/categories" key={cat.id || cat._id} className="group flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-transparent hover:border-yellow-100 cursor-pointer">
+              <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md group-hover:text-yellow-600">
+                {getIcon(cat.icon || 'Package')}
               </div>
               <span className="font-bold text-slate-900 text-center tracking-tight">{cat.name}</span>
             </Link>
@@ -536,14 +550,27 @@ const CategoriesPage = () => {
     }
   };
 
-  const categories = [
-    { name: 'Oturma Odası', icon: <Sofa className="w-8 h-8 text-slate-700" /> },
-    { name: 'Yatak Odası', icon: <Bed className="w-8 h-8 text-slate-700" /> },
-    { name: 'Mutfak', icon: <Utensils className="w-8 h-8 text-slate-700" /> },
-    { name: 'Ofis', icon: <Briefcase className="w-8 h-8 text-slate-700" /> },
-    { name: 'Depolama', icon: <Package className="w-8 h-8 text-slate-700" /> },
-    { name: 'Aksesuar', icon: <Sparkles className="w-8 h-8 text-slate-700" /> }
-  ];
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/v1/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(e => console.error(e));
+  }, []);
+
+  const getIcon = (iconName: string, isSelected: boolean) => {
+    const iconClass = cn("w-6 h-6", isSelected ? "text-white" : "text-slate-700");
+    switch (iconName) {
+      case 'Sofa': return <Sofa className={iconClass} />;
+      case 'Bed': return <Bed className={iconClass} />;
+      case 'Utensils': return <Utensils className={iconClass} />;
+      case 'Briefcase': return <Briefcase className={iconClass} />;
+      case 'Package': return <Package className={iconClass} />;
+      case 'Sparkles': return <Sparkles className={iconClass} />;
+      default: return <Package className={iconClass} />;
+    }
+  };
 
   const toggleCategory = (catName: string) => {
     setSelectedCategories(prev =>
@@ -593,9 +620,7 @@ const CategoriesPage = () => {
                 "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
                 isSelected ? "bg-white/20 text-white" : "bg-slate-50 text-slate-700 group-hover:bg-yellow-50"
               )}>
-                {React.cloneElement(cat.icon as React.ReactElement, { 
-                  className: cn("w-6 h-6", isSelected ? "text-white" : "text-slate-700") 
-                })}
+                {getIcon(cat.icon || 'Package', isSelected)}
               </div>
               <span className={cn(
                 "font-bold text-sm tracking-tight",
@@ -605,6 +630,44 @@ const CategoriesPage = () => {
           )
         })}
       </div>
+
+      {(JSON.parse(localStorage.getItem('user') || '{}').role === 'admin') && (
+        <div className="mb-8 flex justify-end">
+          <button 
+            onClick={() => {
+              const name = prompt('Ürün Adı:');
+              const price = prompt('Fiyat:');
+              const desc = prompt('Açıklama:');
+              const category = prompt('Kategori İsmi (Örn: Oturma Odası):');
+              const imageUrl = prompt('Görsel URL (Boş bırakılabilir):');
+              
+              if (name && price && desc && category) {
+                 const token = localStorage.getItem('token');
+                 fetch('/v1/categories').then(r => r.json()).then(cats => {
+                    const foundCat = cats.find((c: any) => c.name === category);
+                    if (!foundCat) { alert('Hatalı kategori ismi! Lütfen listeden bir isim seçin.'); return; }
+                    
+                    fetch('/v1/products', {
+                      method: 'POST',
+                      headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                      body: JSON.stringify({ name, price: Number(price), description: desc, categoryId: foundCat._id, imageUrl })
+                    }).then(res => {
+                      if (res.ok) {
+                        alert('Ürün başarıyla eklendi!');
+                        window.location.reload();
+                      } else {
+                        alert('Ekleme başarısız!');
+                      }
+                    });
+                 });
+              }
+            }}
+            className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg"
+          >
+            <Package className="w-5 h-5" /> Yeni Ürün Ekle (Admin)
+          </button>
+        </div>
+      )}
 
       <div className="mb-8 flex items-center justify-between">
         <h2 className="text-2xl font-bold font-serif text-slate-900">
@@ -643,6 +706,31 @@ const CategoriesPage = () => {
                 >
                   <ShoppingBag className="w-5 h-5" /> Sepete Ekle
                 </button>
+                {(JSON.parse(localStorage.getItem('user') || '{}').role === 'admin') && (
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (window.confirm('Bu ürünü silmek istediğinize emin misiniz?')) {
+                        const token = localStorage.getItem('token');
+                        fetch(`/v1/products/${prod._id || prod.id}`, {
+                          method: 'DELETE',
+                          headers: {'Authorization': `Bearer ${token}`}
+                        }).then(res => {
+                          if (res.ok) {
+                            alert('Ürün silindi');
+                            window.location.reload();
+                          } else {
+                            res.json().then(d => alert(d.message || 'Silinemedi'));
+                          }
+                        });
+                      }
+                    }}
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-red-50 text-red-600 py-2 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100"
+                  >
+                    <Trash2 className="w-4 h-4" /> Ürünü Sil
+                  </button>
+                )}
               </div>
             </Link>
           ))}
