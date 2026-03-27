@@ -9,27 +9,32 @@ import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth.js';
 const router = express.Router();
 
 const mockCategories = [
-  { name: 'Oturma Odası', description: 'Koltuk, kanepe, sehpa vb.' },
-  { name: 'Dekorasyon', description: 'Aydınlatma, saat, dekorasyon vb.' },
-  { name: 'Yatak Odası', description: 'Yatak, komodin, gardırop vb.' },
-  { name: 'Mutfak', description: 'Mutfak dolabı, ada vb.' },
-  { name: 'Ofis', description: 'Çalışma masası, ofis koltuğu vb.' },
-  { name: 'Depolama', description: 'Raf, dolap vb.' }
+  { name: 'Oturma Odası', description: 'Koltuk, kanepe, sehpa vb.', icon: 'Sofa' },
+  { name: 'Dekorasyon', description: 'Aydınlatma, saat, dekorasyon vb.', icon: 'Sparkles' },
+  { name: 'Yatak Odası', description: 'Yatak, komodin, gardırop vb.', icon: 'Bed' },
+  { name: 'Mutfak', description: 'Mutfak dolabı, ada vb.', icon: 'Utensils' },
+  { name: 'Ofis', description: 'Çalışma masası, ofis koltuğu vb.', icon: 'Briefcase' },
+  { name: 'Depolama', description: 'Raf, dolap vb.', icon: 'Package' },
+  // Alt kategoriler
+  { name: 'Koltuklar', description: 'Kanepe ve berjer modelleri', parentCategoryName: 'Oturma Odası' },
+  { name: 'Sehpalar', description: 'Zigon ve orta sehpalar', parentCategoryName: 'Oturma Odası' },
+  { name: 'Yataklar', description: 'Ortopedik yataklar', parentCategoryName: 'Yatak Odası' },
+  { name: 'Gardıroplar', description: 'Sürgülü ve kapaklı dolaplar', parentCategoryName: 'Yatak Odası' }
 ];
 
 const mockProductsData = [
-  { name: 'Nordic Dinlenme Koltuğu', price: 4250, description: 'Kumaş, Meşe Ayaklar', categoryName: 'Oturma Odası', imageUrl: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=800&q=80' },
-  { name: 'Fjord Orta Sehpa', price: 2750, description: 'Doğal Ahşap, El Yapımı', categoryName: 'Oturma Odası', imageUrl: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Nordic Dinlenme Koltuğu', price: 4250, description: 'Kumaş, Meşe Ayaklar', categoryName: 'Koltuklar', imageUrl: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Fjord Orta Sehpa', price: 2750, description: 'Doğal Ahşap, El Yapımı', categoryName: 'Sehpalar', imageUrl: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=800&q=80' },
   { name: 'Lumi Sarkıt Avize', price: 1450, description: 'Mat Siyah, İskandinav Stil', categoryName: 'Dekorasyon', imageUrl: 'https://images.unsplash.com/photo-1517991104123-1d56a6e81ed9?auto=format&fit=crop&w=800&q=80' },
   { name: 'Minimalist Duvar Saati', price: 850, description: 'Meşe Ahşap Kadran', categoryName: 'Dekorasyon', imageUrl: 'https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?auto=format&fit=crop&w=800&q=80' },
-  { name: 'Stockholm Üçlü Koltuk', price: 12900, description: 'Premium Antrasit Kumaş', categoryName: 'Oturma Odası', imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80' },
-  { name: 'Luxe Kadife Yatak', price: 14999, description: 'Bej - 160x200 cm', categoryName: 'Yatak Odası', imageUrl: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Stockholm Üçlü Koltuk', price: 12900, description: 'Premium Antrasit Kumaş', categoryName: 'Koltuklar', imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Luxe Kadife Yatak', price: 14999, description: 'Bej - 160x200 cm', categoryName: 'Yataklar', imageUrl: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80' },
   { name: 'Nordic Meşe Komodin', price: 2450, description: 'Doğal Ahşap', categoryName: 'Yatak Odası', imageUrl: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=800&q=80' },
   { name: 'Vera Mutfak Dolabı', price: 24500, description: 'Mat Beyaz - Modüler', categoryName: 'Mutfak', imageUrl: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80' },
   { name: 'Marble Chef Mutfak Adası', price: 18900, description: 'Carrara Mermer - Meşe', categoryName: 'Mutfak', imageUrl: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80' },
   { name: 'Minimalist Çalışma Masası', price: 2499, description: 'Doğal Meşe', categoryName: 'Ofis', imageUrl: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?auto=format&fit=crop&w=800&q=80' },
   { name: 'Ergonomik Yönetici Koltuğu', price: 4150, description: 'Premium Mesh', categoryName: 'Ofis', imageUrl: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?auto=format&fit=crop&w=800&q=80' },
-  { name: 'Nórdica Gardırop', price: 4299, description: 'Meşe ve Beyaz Lake, 2 Kapaklı', categoryName: 'Depolama', imageUrl: 'https://images.unsplash.com/photo-1595428774223-efda33457007?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Nórdica Gardırop', price: 4299, description: 'Meşe ve Beyaz Lake, 2 Kapaklı', categoryName: 'Gardıroplar', imageUrl: 'https://images.unsplash.com/photo-1595428774223-efda33457007?auto=format&fit=crop&w=800&q=80' },
   { name: 'Industrial Raf Ünitesi', price: 1850, description: 'Siyah Metal ve Masif Ahşap', categoryName: 'Depolama', imageUrl: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=800&q=80' },
 ];
 
@@ -52,15 +57,32 @@ router.get('/seed', async (req, res) => {
     await Product.deleteMany({});
     await Category.deleteMany({});
     
-    // Insert categories
-    const insertedCategories = await Category.insertMany(mockCategories);
+    // Insert top-level categories first
+    const topLevelCats = mockCategories.filter(c => !c.parentCategoryName);
+    const subCats = mockCategories.filter(c => c.parentCategoryName);
     
-    // Map category names to their new ObjectIds
-    const categoryMap = insertedCategories.reduce((acc, cat) => {
+    const insertedTopLevel = await Category.insertMany(topLevelCats);
+    
+    // Build map for parent IDs
+    const categoryMap = insertedTopLevel.reduce((acc, cat) => {
       acc[cat.name] = cat._id;
       return acc;
     }, {} as Record<string, mongoose.Types.ObjectId>);
-
+    
+    // Prepare subcategories with parentCategoryId
+    const subToInsert = subCats.map(sc => ({
+      name: sc.name,
+      description: sc.description,
+      parentCategoryId: categoryMap[sc.parentCategoryName as string]
+    }));
+    
+    const insertedSubLevel = await Category.insertMany(subToInsert);
+    
+    // Final category map including subcategories
+    insertedSubLevel.forEach(cat => {
+      categoryMap[cat.name] = cat._id;
+    });
+    
     // Prepare products with categoryId
     const productsToInsert = mockProductsData.map(p => {
       const { categoryName, ...rest } = p;
@@ -75,7 +97,7 @@ router.get('/seed', async (req, res) => {
     
     res.json({ 
       message: 'Veritabanı başarıyla güncellendi!',
-      categoriesCount: insertedCategories.length,
+      categoriesCount: insertedTopLevel.length + insertedSubLevel.length,
       productsCount: insertedProducts.length 
     });
   } catch (error) {
@@ -84,34 +106,63 @@ router.get('/seed', async (req, res) => {
   }
 });
 
-// POST /products - Create a new product (Admin only)
+// @route   POST /v1/products
+// @desc    Create a new product (Admin only)
 router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
   try {
-    const { name, price, description, stock, categoryId, imageUrl } = req.body;
+    let { name, price, description, stock, categoryId, imageUrl, images } = req.body;
 
     if (!name || !price || !description || !categoryId) {
-      return res.status(400).json({ message: 'Lütfen tüm zorunlu alanları doldurun' });
+      return res.status(400).json({ message: 'Lütfen tüm zorunlu alanları (name, price, description, categoryId) doldurun' });
+    }
+
+    // CategoryId doğrulama ve isimle arama desteği
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      const cat = await Category.findOne({ name: categoryId });
+      if (cat) {
+        categoryId = cat._id;
+      } else {
+        return res.status(400).json({ message: 'Geçersiz kategori ID veya ismi' });
+      }
+    } else {
+      // ID geçerli olsa bile kategorinin varlığını kontrol et
+      const catExists = await Category.findById(categoryId);
+      if (!catExists) {
+        return res.status(404).json({ message: 'Belirtilen kategori bulunamadı' });
+      }
+    }
+
+    const finalImages = images && Array.isArray(images) && images.length > 0 ? images : (imageUrl ? [imageUrl] : ['https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80']);
+    const finalImageUrl = imageUrl || finalImages[0];
+
+    // Ürün adı kontrolü (Opsiyonel: Aynı isimde ürün var mı?)
+    const existingProduct = await Product.findOne({ name });
+    if (existingProduct) {
+      return res.status(400).json({ message: 'Bu isimde bir ürün zaten mevcut' });
     }
 
     const product = new Product({
       name,
-      price,
+      price: Number(price),
       description,
-      stock: stock || 10,
+      stock: stock !== undefined ? Number(stock) : 10,
       categoryId,
-      imageUrl: imageUrl || 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=400&q=80'
+      imageUrl: finalImageUrl,
+      images: finalImages
     });
 
     await product.save();
     
     res.status(201).json({
-      id: product._id,
+      id: product._id.toString(),
       name: product.name,
       description: product.description,
+      desc: product.description,
       price: product.price,
       stock: product.stock,
-      categoryId: product.categoryId,
-      imageUrl: product.imageUrl
+      categoryId: product.categoryId?.toString(),
+      imageUrl: product.imageUrl,
+      images: product.images
     });
   } catch (error: any) {
     console.error('❌ POST /products error:', error);
@@ -122,6 +173,26 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
 // GET /products
 router.get('/', async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      console.warn("⚠️ Veritabanı bağlı değil, örnek ürün verileri yükleniyor.");
+      return res.json({
+        products: mockProductsData.map((p, index) => ({
+          ...p,
+          id: String(index + 1),
+          _id: String(index + 1),
+          desc: p.description,
+          category: p.categoryName,
+          // Mock categoryId based on name for offline filtering
+          categoryId: p.categoryName === 'Koltuklar' ? '101' : 
+                     p.categoryName === 'Sehpalar' ? '102' :
+                     p.categoryName === 'Yataklar' ? '201' :
+                     p.categoryName === 'Gardıroplar' ? '202' : '1', 
+          stock: 10
+        })),
+        pagination: { total: mockProductsData.length, page: 1, pages: 1, limit: 100 }
+      });
+    }
+
     const { q, categoryId, minPrice, maxPrice, page = '1', limit = '10' } = req.query;
     
     let query: any = {};
@@ -134,7 +205,13 @@ router.get('/', async (req, res) => {
     }
     
     if (categoryId) {
-      query.categoryId = categoryId;
+      if (mongoose.Types.ObjectId.isValid(categoryId as string)) {
+        query.categoryId = categoryId;
+      } else {
+        // Fallback: search by name if ID is not a valid ObjectId (useful for Postman testing)
+        const cat = await Category.findOne({ name: categoryId });
+        if (cat) query.categoryId = cat._id;
+      }
     }
     
     if (minPrice || maxPrice) {
@@ -143,47 +220,91 @@ router.get('/', async (req, res) => {
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
 
-    const pageNumber = parseInt(page as string, 10);
-    const limitNumber = parseInt(limit as string, 10);
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const limitNumber = parseInt(limit as string, 10) || 100;
     const skip = (pageNumber - 1) * limitNumber;
 
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)
       .populate('categoryId', 'name')
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNumber);
     
     res.json({
       products: products.map((product: any) => ({
-      id: product._id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      categoryId: product.categoryId?._id,
-      category: product.categoryId?.name || '',
-      imageUrl: product.imageUrl
+        id: product._id.toString(),
+        name: product.name,
+        description: product.description,
+        desc: product.description,
+        price: product.price,
+        stock: product.stock,
+        categoryId: (product.categoryId as any)?._id?.toString() || product.categoryId?.toString() || null,
+        category: (product.categoryId as any)?.name || '',
+        imageUrl: product.imageUrl,
+        images: product.images && product.images.length > 0 ? product.images : [product.imageUrl]
       })),
       pagination: {
         total,
         page: pageNumber,
-        pages: Math.ceil(total / limitNumber),
+        pages: limitNumber > 0 ? Math.ceil(total / limitNumber) : 1,
         limit: limitNumber
       }
     });
-  } catch (error) {
-    res.status(500).json({ message: 'Sunucu hatası' });
+  } catch (error: any) {
+    console.error('❌ GET /products error:', error);
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
+  }
+});
+
+// GET /products/:productId
+router.get('/:productId', async (req, res) => {
+  try {
+    const { productId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: 'Geçersiz ürün ID formatı' });
+    }
+
+    const product = await Product.findById(productId).populate('categoryId', 'name');
+    if (!product) {
+      return res.status(404).json({ message: 'Ürün bulunamadı' });
+    }
+    res.json({
+      id: product._id.toString(),
+      name: product.name,
+      description: product.description,
+      desc: product.description,
+      price: product.price,
+      stock: product.stock,
+      categoryId: (product.categoryId as any)?._id?.toString() || product.categoryId?.toString() || null,
+      category: (product.categoryId as any)?.name || '',
+      imageUrl: product.imageUrl,
+      images: product.images && product.images.length > 0 ? product.images : [product.imageUrl]
+    });
+  } catch (error: any) {
+    console.error('❌ GET /products/:id error:', error);
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
   }
 });
 
 // PUT /products/:productId
 router.put('/:productId', authenticate, requireAdmin, async (req: AuthRequest, res) => {
   try {
-    const { name, price, description, stock, categoryId, imageUrl } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(req.params.productId)) {
+      return res.status(400).json({ message: 'Geçersiz ürün ID formatı' });
+    }
+    const { name, price, description, stock, categoryId, imageUrl, images } = req.body;
+
+    const updateData: any = { name, price, description, stock, categoryId, imageUrl, images };
+    if (images && Array.isArray(images) && images.length > 0) {
+      updateData.imageUrl = imageUrl || images[0];
+    } else if (imageUrl) {
+      updateData.images = [imageUrl];
+    }
 
     const product = await Product.findByIdAndUpdate(
       req.params.productId,
-      { $set: { name, price, description, stock, categoryId, imageUrl } },
+      { $set: updateData },
       { new: true }
     );
 
@@ -192,16 +313,19 @@ router.put('/:productId', authenticate, requireAdmin, async (req: AuthRequest, r
     }
 
     res.json({
-      id: product._id,
+      id: product._id.toString(),
       name: product.name,
       description: product.description,
+      desc: product.description,
       price: product.price,
       stock: product.stock,
-      categoryId: product.categoryId,
-      imageUrl: product.imageUrl
+      categoryId: product.categoryId?.toString() || null,
+      imageUrl: product.imageUrl,
+      images: product.images
     });
-  } catch (error) {
-    res.status(400).json({ message: 'Geçersiz istek verisi' });
+  } catch (error: any) {
+    console.error('❌ PUT /products/:id error:', error);
+    res.status(400).json({ message: 'Geçersiz istek verisi', error: error.message });
   }
 });
 

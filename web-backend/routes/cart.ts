@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
@@ -8,6 +9,11 @@ const router = express.Router();
 // GET /cart
 router.get('/', authenticate, async (req: AuthRequest, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      console.warn("⚠️ Veritabanı bağlı değil, boş sepet dönülüyor.");
+      return res.json({ items: [], total: 0 });
+    }
+
     let cart = await Cart.findOne({ userId: req.user?.userId }).populate('items.productId', 'name imageUrl');
     
     if (!cart) {
@@ -37,6 +43,10 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
 router.post('/items', authenticate, async (req: AuthRequest, res) => {
   try {
     const { productId, quantity } = req.body;
+
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ message: 'Veritabanı bağlı değil. Sepet işlemleri şu an yapılamıyor.' });
+    }
 
     if (!productId || !quantity || quantity < 1) {
       return res.status(400).json({ message: 'Geçersiz istek verisi' });
@@ -109,6 +119,10 @@ router.put('/items/:itemId', authenticate, async (req: AuthRequest, res) => {
   try {
     const { quantity } = req.body;
 
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ message: 'Veritabanı bağlı değil. Güncelleme yapılamıyor.' });
+    }
+
     if (!quantity || quantity < 1) {
       return res.status(400).json({ message: 'Geçersiz istek verisi' });
     }
@@ -160,6 +174,10 @@ router.put('/items/:itemId', authenticate, async (req: AuthRequest, res) => {
 // DELETE /cart/items/:itemId
 router.delete('/items/:itemId', authenticate, async (req: AuthRequest, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ message: 'Veritabanı bağlı değil. Silme işlemi yapılamıyor.' });
+    }
+
     const cart = await Cart.findOne({ userId: req.user?.userId });
     if (!cart) {
       return res.status(404).json({ message: 'Sepet bulunamadı' });

@@ -70,9 +70,9 @@ router.post("/login", async (req, res) => {
     );
 
     res.json({ token });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Sunucu hatası" });
+    res.status(500).json({ message: "Sunucu hatası", error: error.message });
   }
 });
 
