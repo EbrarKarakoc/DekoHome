@@ -42,7 +42,7 @@
 
 ### Kullanıcı Deneyimi
 - Başarı → Toast "Kategori güncellendi." (success) + `GET /v1/categories` ile liste yenilenir
-- Hata → Toast "Güncelleme başarısız." (error)
+- Hata → Toast "Güncelleme başarısız ." (error)
 - 401 yanıtı → `handleAuthError` ile otomatik çıkış + `/login` yönlendirme
 
 ### Teknik Detaylar
