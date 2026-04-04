@@ -1,0 +1,257 @@
+{
+  "info": {
+    "_postman_id": "07d630c9-1b33-4977-9a34-af9e9e911c85",
+    "name": "DEKOHOME",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50524856",
+    "_collection_link": "https://go.postman.co/collection/50524856-07d630c9-1b33-4977-9a34-af9e9e911c85?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "https://dekohome-api.onrender.com/v1/auth/register",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"gullnihal@test.com\",\r\n  \"password\": \"Test1234\",\r\n  \"ad\": \"Gülnihal\",\r\n  \"soyad\": \"Köse\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dekohome-api.onrender.com/v1/auth/register",
+          "protocol": "https",
+          "host": [
+            "dekohome-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "\thttps://dekohome-api.onrender.com/v1/auth/login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"gulnihal@test.com\",\r\n  \"password\": \"Test1234\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dekohome-api.onrender.com/v1/auth/login",
+          "protocol": "https",
+          "host": [
+            "dekohome-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWQxMGVjMmIwYzNjMDE4ZmU4OGRiMmYiLCJyb2xlIjoidXNlciIsImFkIjoiR8O8bG5paGFsIiwic295YWQiOiJLw7ZzZSIsImlhdCI6MTc3NTMwODc2OCwiZXhwIjoxNzc1Mzk1MTY4fQ.PplPpH9W-Tt9wbJbvjIwPM_M8pUZRRXnL18j4j2VeMw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f",
+          "protocol": "https",
+          "host": [
+            "dekohome-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "users",
+            "69d10ec2b0c3c018fe88db2f"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWQxMGVjMmIwYzNjMDE4ZmU4OGRiMmYiLCJyb2xlIjoidXNlciIsImFkIjoiR8O8bG5paGFsIiwic295YWQiOiJLw7ZzZSIsImlhdCI6MTc3NTMwODc2OCwiZXhwIjoxNzc1Mzk1MTY4fQ.PplPpH9W-Tt9wbJbvjIwPM_M8pUZRRXnL18j4j2VeMw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"ad\": \"Gülnihal Yeni\",\r\n  \"soyad\": \"Köse Güncellendi\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f",
+          "protocol": "https",
+          "host": [
+            "dekohome-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "users",
+            "69d10ec2b0c3c018fe88db2f"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "\thttps://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f/preferences/categories",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWQxMGVjMmIwYzNjMDE4ZmU4OGRiMmYiLCJyb2xlIjoidXNlciIsImFkIjoiR8O8bG5paGFsIiwic295YWQiOiJLw7ZzZSIsImlhdCI6MTc3NTMwODc2OCwiZXhwIjoxNzc1Mzk1MTY4fQ.PplPpH9W-Tt9wbJbvjIwPM_M8pUZRRXnL18j4j2VeMw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"categoryId\": \"69c681a153fa902e2054855a\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f/preferences/categories",
+          "protocol": "https",
+          "host": [
+            "dekohome-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "users",
+            "69d10ec2b0c3c018fe88db2f",
+            "preferences",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "\thttps://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f/preferences/categories/69c681a153fa902e2054855a",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWQxMGVjMmIwYzNjMDE4ZmU4OGRiMmYiLCJyb2xlIjoidXNlciIsImFkIjoiR8O8bG5paGFsIiwic295YWQiOiJLw7ZzZSIsImlhdCI6MTc3NTMwODc2OCwiZXhwIjoxNzc1Mzk1MTY4fQ.PplPpH9W-Tt9wbJbvjIwPM_M8pUZRRXnL18j4j2VeMw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f/preferences/categories/69c681a153fa902e2054855a",
+          "protocol": "https",
+          "host": [
+            "dekohome-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "users",
+            "69d10ec2b0c3c018fe88db2f",
+            "preferences",
+            "categories",
+            "69c681a153fa902e2054855a"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "\thttps://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWQxMGVjMmIwYzNjMDE4ZmU4OGRiMmYiLCJyb2xlIjoidXNlciIsImFkIjoiR8O8bG5paGFsIiwic295YWQiOiJLw7ZzZSIsImlhdCI6MTc3NTMwODc2OCwiZXhwIjoxNzc1Mzk1MTY4fQ.PplPpH9W-Tt9wbJbvjIwPM_M8pUZRRXnL18j4j2VeMw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://dekohome-api.onrender.com/v1/users/69d10ec2b0c3c018fe88db2f",
+          "protocol": "https",
+          "host": [
+            "dekohome-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "users",
+            "69d10ec2b0c3c018fe88db2f"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
