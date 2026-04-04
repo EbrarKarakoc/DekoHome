@@ -3,7 +3,14 @@
 **Proje:** DekoHome Web Uygulaması  
 **Frontend Adresi:** [dekohome-api.onrender.com](https://dekohome-api.onrender.com)  
 **Kaynak Dosya:** `web-frontend/src/App.tsx`  
-**Front-end Test Videosu:** *(Link buraya eklenecek)*
+**Front-end Test Videosu:** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05)
+
+> [!NOTE]
+> **Front-end Entegrasyon Durumu Hakkında Not:**
+>
+> Üstlendiğim gereksinimlerden **"Kategori Listeleme"** ve **"Ürün Listeleme"** (`GET`) metotları front-end tarafına başarıyla entegre edilmiş olup, veriler web sitemizin arayüzünde dinamik olarak sergilenmektedir *(videoda gösterilmiştir)*.
+>
+> Ancak **Ekleme, Silme ve Güncelleme** (`POST`, `PUT`, `DELETE`) işlemleri için projemizin Admin Paneli arayüzü henüz geliştirme aşamasında olduğundan, bu metotların veri akışı ve veritabanı yansımaları **Postman** üzerinden test edilip web sitemizin canlı arayüzünden anlık olarak doğrulanmıştır.
 
 ---
 
