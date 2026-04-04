@@ -1,6 +1,6 @@
 # REST API Adresi
 
-https://dekohome-api.onrender.com/v1
+https://dekohome-api.onrender.com
 
 ---
 
