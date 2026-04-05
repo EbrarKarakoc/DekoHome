@@ -3,7 +3,7 @@
 ## Sunum Videosu
 
 > **Gülnihal Köse - Gereksinim Videosu:** [https://youtu.be/DV2jWF2q54k](https://youtu.be/DV2jWF2q54k)  
-> **Video Linki:** [Sunum videosu linki buraya eklenecek](https://example.com)
+> **Şerife Nur Yılmaz - Gereksinim Videosu:** [https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05](https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05) (Video)
 
 ---
 
