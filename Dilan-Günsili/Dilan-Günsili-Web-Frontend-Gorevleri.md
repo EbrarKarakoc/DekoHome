@@ -3,7 +3,7 @@
 **Proje:** DekoHome Web Uygulaması  
 **Frontend Adresi:** [dekohome-api.onrender.com](https://dekohome-api.onrender.com)  
 **Kaynak Dosya:** `web-frontend/src/App.tsx`  
-**Front-end Test Videosu:** [Youtube link] *https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj*
+**Front-end Test Videosu:** [YouTube_vidom] (https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj)
 
 ---
 
