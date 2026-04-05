@@ -1,0 +1,357 @@
+{
+  "info": {
+    "name": "DekoHome — Ebrar Karakoç API Testleri",
+    "_postman_id": "ebrar-karakoc-dekohome-2025",
+    "description": "Ebrar Karakoç'un REST API görevleri: Sipariş Oluşturma, İptali, Güncelleme, Listeleme + Yorum Ekleme ve Silme\n\nBase URL: https://dekohome-api.onrender.com\n\n**Test Akışı:**\n1. 🔐 Giriş Yap → token otomatik kaydedilir\n2. 🛒 Sepete Ürün Ekle (sipariş için gerekli)\n3. 📦 Sipariş Oluştur → orderId otomatik kaydedilir\n4. 📋 Siparişleri Listele\n5. ✏️ Sipariş Güncelle\n6. ❌ Sipariş İptal Et\n7. ⭐ Yorum Ekle → reviewId otomatik kaydedilir\n8. 🗑️ Yorum Sil",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://dekohome-api.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "Login sonrası otomatik dolar"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string",
+      "description": "Sipariş oluşturulduktan sonra otomatik dolar"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string",
+      "description": "Ürün listesinden otomatik alınır"
+    },
+    {
+      "key": "reviewId",
+      "value": "",
+      "type": "string",
+      "description": "Yorum eklendikten sonra otomatik dolar"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 1. Giriş Yap (Login)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.token) {",
+              "    pm.collectionVariables.set('token', json.token);",
+              "    console.log('✅ Token kaydedildi:', json.token.substring(0, 30) + '...');",
+              "    pm.test('Token alındı', () => pm.expect(json.token).to.be.a('string'));",
+              "} else {",
+              "    pm.test('Login başarısız — token yok', () => pm.expect.fail(JSON.stringify(json)));",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ebrar@example.com\",\n  \"password\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "🛒 2. Ürünleri Listele (productId al)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "const products = json.products || [];",
+              "if (products.length > 0) {",
+              "    const pid = products[0].id || products[0]._id;",
+              "    pm.collectionVariables.set('productId', pid);",
+              "    console.log('✅ productId kaydedildi:', pid, '—', products[0].name);",
+              "    pm.test('Ürünler listelendi', () => pm.expect(products.length).to.be.above(0));",
+              "} else {",
+              "    pm.test('Ürün listesi boş', () => pm.expect.fail('Ürün bulunamadı'));",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/v1/products?limit=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "products"],
+          "query": [
+            { "key": "limit", "value": "5" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "🛒 3. Sepete Ürün Ekle (Sipariş için gerekli)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Sepete eklendi (200/201)', () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "console.log('✅ Sepet güncellendi:', pm.response.json());"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/cart/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "cart", "items"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "📦 4. Sipariş Oluştur — POST /orders",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "const oid = json._id || json.id;",
+              "if (oid) {",
+              "    pm.collectionVariables.set('orderId', oid);",
+              "    console.log('✅ orderId kaydedildi:', oid);",
+              "} else {",
+              "    console.warn('⚠️ orderId alınamadı:', JSON.stringify(json));",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"address\": \"İstanbul, Kadıköy, Moda Caddesi No:42 D:5\",\n  \"note\": \"Kapıya bırakın.\",\n  \"paymentMethod\": \"Kredi / Banka Kartı\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "📋 5. Siparişleri Listele — GET /orders",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Dizi döndü', () => pm.expect(json).to.be.an('array'));",
+              "console.log('📋 Toplam sipariş:', json.length);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✏️ 6. Sipariş Güncelle — PUT /orders/{orderId}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK — güncelleme başarılı', () => pm.response.to.have.status(200));",
+              "console.log('✅ Güncellenen sipariş:', pm.response.json());"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"address\": \"İstanbul, Beşiktaş, Barbaros Bulvarı No:10 D:3\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "❌ 7. Sipariş İptal Et — DELETE /orders/{orderId}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('204 No Content — iptal başarılı', () => pm.response.to.have.status(204));",
+              "console.log('✅ Sipariş iptal edildi. orderId:', pm.collectionVariables.get('orderId'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "⭐ 8. Yorum Ekle — POST /products/{productId}/reviews",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Yorum ekleyebilmek için önce bu ürünü sipariş etmiş olmanız gerekir.",
+              "// Sipariş oluşturup TAMAMLANMIŞ bir siparişiniz varsa bu endpoint çalışır.",
+              "// productId değişkeni Adım 2'de otomatik ayarlandı."
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (pm.response.code === 201) {",
+              "    const rid = json.id || json._id;",
+              "    if (rid) {",
+              "        pm.collectionVariables.set('reviewId', rid);",
+              "        console.log('✅ reviewId kaydedildi:', rid);",
+              "    }",
+              "    pm.test('201 Created — yorum eklendi', () => pm.response.to.have.status(201));",
+              "} else {",
+              "    console.warn('⚠️ Yanıt:', pm.response.code, JSON.stringify(json));",
+              "    pm.test('Durum: ' + pm.response.code + ' — ' + (json.message || ''), () => {",
+              "        pm.expect(pm.response.code).to.equal(201);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Çok kaliteli ve rahat. Kesinlikle tavsiye ederim!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/products/{{productId}}/reviews",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "products", "{{productId}}", "reviews"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "🗑️ 9. Yorum Sil — DELETE /products/{productId}/reviews/{reviewId}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('204 No Content — yorum silindi', () => pm.response.to.have.status(204));",
+              "console.log('✅ Yorum silindi. reviewId:', pm.collectionVariables.get('reviewId'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v1/products/{{productId}}/reviews/{{reviewId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "products", "{{productId}}", "reviews", "{{reviewId}}"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
