@@ -2,6 +2,7 @@
 
 ## Sunum Videosu
 
+> **Gülnihal Köse - Gereksinim Videosu:** [https://youtu.be/DV2jWF2q54k](https://youtu.be/DV2jWF2q54k)  
 > **Video Linki:** [Sunum videosu linki buraya eklenecek](https://example.com)
 
 ---
@@ -23,6 +24,8 @@
 **Kişisel Tanıtım:**
 - İsim: Gülnihal Köse
 - Rol: Kullanıcı İşlemleri & Kategori Ekleme/Silme
+
+**Gereksinim Videosu:** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/DV2jWF2q54k)
 
 **Gereksinimler:**
 1. **Üye Olma**

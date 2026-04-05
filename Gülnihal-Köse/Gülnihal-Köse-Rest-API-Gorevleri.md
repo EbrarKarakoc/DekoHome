@@ -1,6 +1,7 @@
 # REST API Adresi
 
 https://dekohome-api.onrender.com
+**REST API Test Videosu:** [https://youtu.be/DV2jWF2q54k](https://youtu.be/DV2jWF2q54k) (Video)
 
 ---
 
