@@ -6,6 +6,7 @@
 > **Şerife Nur Yılmaz - Gereksinim Videosu:** [https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05](https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05) (Video)
 > **Ebrar Karakoç - Gereksinim Videosu:** [https://youtu.be/bJPQqyBqfGs](https://youtu.be/bJPQqyBqfGs)
 
+ **Dilan Günsili - Gereksinim Videosu:** [https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj](https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj)
 ---
 
 ## Sunum Yapısı
@@ -131,6 +132,9 @@
 **Kişisel Tanıtım:**
 - İsim: Dilan Günsili
 - Rol: Sepet İşlemleri & Yorum Güncelleme/Listeleme
+
+**Gereksinim Videosu:** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj)
+
 
 **Gereksinimler:**
 1. **Sepete Ürün Ekleme**
