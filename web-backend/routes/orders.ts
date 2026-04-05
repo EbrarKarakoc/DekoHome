@@ -77,7 +77,7 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
       query.userId = req.user?.userId;
     }
 
-    const orders = await Order.find(query).sort({ createdAt: -1 });
+    const orders = await Order.find(query).populate('items.productId').sort({ createdAt: -1 });
 
     res.json(orders.map(order => ({
       id: order._id,
@@ -87,12 +87,17 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
       paymentMethod: order.paymentMethod,
       note: order.note,
       createdAt: order.createdAt,
-      items: order.items.map(item => ({
-        itemId: item._id,
-        productId: item.productId,
-        quantity: item.quantity,
-        price: item.price
-      }))
+      items: order.items.map(item => {
+        const product = item.productId as any;
+        return {
+          itemId: item._id,
+          productId: product?._id || item.productId,
+          name: product?.name,
+          imageUrl: product?.imageUrl,
+          quantity: item.quantity,
+          price: item.price
+        };
+      })
     })));
   } catch (error) {
     res.status(500).json({ message: 'Sunucu hatası' });
@@ -155,6 +160,11 @@ router.delete('/:orderId', authenticate, async (req: AuthRequest, res) => {
        return res.status(400).json({ message: 'Sipariş zaten iptal edilmiş' });
     }
 
+    // If 'Onaylandı' is a cancelable status, it should not be in this condition.
+    // The current condition correctly identifies non-cancelable statuses.
+    // If the intent was to make 'Onaylandı' non-cancelable, it would be added here.
+    // As per the instruction "adding 'Onaylandı' to the cancelable statuses",
+    // it means 'Onaylandı' should pass this check and proceed to cancellation.
     if (order.status === 'Kargoya Verildi' || order.status === 'Teslim Edildi') {
       return res.status(400).json({ message: 'Bu aşamadaki sipariş iptal edilemez' });
     }

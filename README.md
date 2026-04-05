@@ -52,7 +52,7 @@ DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atab
 
 | Servis | Adres |
 |--------|-------|
-| REST API | `api.yazmuh.com` |
+| REST API | `dekohome-api.onrender.com` |(https://dekohome-api.onrender.com)|
 | Web Frontend | `frontend.yazmuh.com` |
 | GitHub | [github.com/EbrarKarakoc/DekoHome](https://github.com/EbrarKarakoc/DekoHome) |
 
@@ -78,7 +78,7 @@ Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
 - [Gereksinim Analizi](Gereksinim-Analizi.md)
 - [REST API Tasarımı](API-Tasarimi.md)
 - [REST API Metotları](Rest-API.md)
-- Web Front-End
+- [Web Back-End](WebBackEnd.md)
 - Mobil Front-End
 - Mobil Backend
 - Video Sunum

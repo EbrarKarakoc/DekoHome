@@ -8,136 +8,148 @@
 
 ## Sunum Yapısı
 
-### 1. Grup Lideri - Açılış Konuşması (1-2 dakika)
-
-**Konuşma İçeriği:**
-- Grup adının tanıtılması
-- Projenin genel tanıtımı
-- Projenin amacı ve kapsamı
-- Sunumun yapısının kısaca açıklanması
-
-**Örnek Konuşma:**
-> "Merhaba, ben [Grup Lideri İsmi]. [Grup Adı] ekibi olarak [Proje Adı] projesini geliştirdik. Bu proje [kısa proje açıklaması]. Bugün sizlere projemizi ve ekibimizin çalışmalarını sunacağız. Her ekip üyesi kendini tanıtacak ve sorumlu olduğu gereksinimleri gösterecek."
+** Konuşma:**
+> "Merhaba,Meyran ekibi olarak DekoHome projesini geliştirdik. Bu proje, modern mobilya ve ev dekorasyonu ürünlerini web ve mobil platformlarda kullanıcılarla buluşturan bir e-ticaret uygulamasıdır. Bugün sizlere projemizi ve ekibimizin çalışmalarını sunacağız. Her ekip üyesi kendini tanıtacak ve sorumlu olduğu gereksinimleri gösterecek.Yukarıda verilen 4 Youtube linkini izleyerek projemiz hakkında bilgi alabilirsiniz."
 
 ---
 
-### 2. Ekip Üyeleri - Kişisel Tanıtım ve Gereksinim Sunumu
 
-Her ekip üyesi için aşağıdaki yapı takip edilecektir:
 
-#### Format (Her üye için 4-6 dakika)
 
-**A) Kişisel Tanıtım (30-45 saniye)**
-- Yüz görünecek şekilde kamera karşısında
-- İsim ve soyisim
-- Ekipteki rolü
-- Sorumlu olduğu alan (Backend/Frontend/Mobil vb.)
-
-**B) Gereksinim Sunumu (3.5-5 dakika)**
-- Sorumlu olduğu gereksinimlerin listesi
-- Her gereksinimin kısa açıklaması
-- Canlı demo (ekran kaydı ile)
-- Her gereksinimin çalışır durumda olduğunun detaylı gösterilmesi
-- Her gereksinim için yeterli süre ayrılmalı (yaklaşık 1-1.5 dakika/gereksinim)
-
----
 
 ### 3. Ekip Üyeleri Sunum Sırası
 
-#### Ali Tutar
+#### Gülnihal Köse
 **Kişisel Tanıtım:**
-- İsim: Ali Tutar
+- İsim: Gülnihal Köse
+- Rol: Kullanıcı İşlemleri & Kategori Ekleme/Silme
 
 **Gereksinimler:**
 1. **Üye Olma**
    - API Metodu: `POST /auth/register`
    - Demo: Kullanıcı kayıt işleminin gösterilmesi
 
-2. **Profil Görüntüleme**
+2. **Giriş Yapma**
+   - API Metodu: `POST /auth/login`
+   - Demo: E-posta ve şifre ile sisteme giriş yapılması
+
+3. **Profil Görüntüleme**
    - API Metodu: `GET /users/{userId}`
    - Demo: Kullanıcı profil bilgilerinin görüntülenmesi
 
-3. **Profil Güncelleme**
+4. **Profil Güncelleme**
    - API Metodu: `PUT /users/{userId}`
    - Demo: Profil bilgilerinin güncellenmesi
 
-4. **Hesap Silme**
+5. **Hesap Silme**
    - API Metodu: `DELETE /users/{userId}`
    - Demo: Hesap silme işleminin gösterilmesi
 
+6. **Kategori Seçme (Filtreleme)**
+   - API Metodu: `POST /users/{userId}/preferences/categories`
+   - Demo: Kullanıcının ilgi duyduğu kategorileri seçmesi
+
+7. **Kategori Silme (Filtreyi Kaldırma)**
+   - API Metodu: `DELETE /users/{userId}/preferences/categories/{categoryId}`
+   - Demo: Seçilen kategori filtresinin kaldırılması
+
 ---
 
-#### Veli Yılmaz
+#### Şerife Nur Yılmaz
 **Kişisel Tanıtım:**
-- İsim: Veli Yılmaz
-- Rol: [Rol belirtilecek]
+- İsim: Şerife Nur Yılmaz
+- Rol: Kategori İşlemleri & Ürün Yönetimi
+
+**Gereksinim Videosu:** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05)
 
 **Gereksinimler:**
-- [Gereksinim 1]
-- [Gereksinim 2]
-- [Gereksinim 3]
-- [Gereksinim 4]
+1. **Kategori Güncelleme**
+   - API Metodu: `PUT /categories/{categoryId}`
+   - Demo: Admin paneli üzerinden kategori bilgilerinin güncellenmesi
+
+2. **Kategori Listeleme**
+   - API Metodu: `GET /categories`
+   - Demo: Tüm kategorilerin hiyerarşik yapıda listelenmesi
+
+3. **Ürün Ekleme**
+   - API Metodu: `POST /products`
+   - Demo: Admin tarafından yeni ürün eklenmesi
+
+4. **Ürün Güncelleme**
+   - API Metodu: `PUT /products/{productId}`
+   - Demo: Mevcut ürün bilgilerinin güncellenmesi
+
+5. **Ürün Listeleme**
+   - API Metodu: `GET /products`
+   - Demo: Ürün kataloğunun listelenmesi ve filtrelenmesi
+
+6. **Ürün Silme**
+   - API Metodu: `DELETE /products/{productId}`
+   - Demo: Ürünün sistemden silinmesi
 
 ---
 
-### 4. Grup Lideri - Kapanış Konuşması (1 dakika)
+#### Ebrar Karakoç
+**Kişisel Tanıtım:**
+- İsim: Ebrar Karakoç
+- Rol: Sipariş İşlemleri & Yorum Ekleme/Silme
 
-**Konuşma İçeriği:**
-- Tüm gereksinimlerin tamamlandığının özeti
-- Projenin başarıyla tamamlandığının vurgulanması
+**Gereksinimler:**
+1. **Sipariş Oluşturma**
+   - API Metodu: `POST /orders`
+   - Demo: Sepetteki ürünlerden sipariş oluşturulması
 
-**Örnek Konuşma:**
-> "Bugün sizlere [Proje Adı] projemizi sunduk. Tüm ekip üyelerimiz sorumlu oldukları gereksinimleri başarıyla tamamladılar ve çalışır durumda gösterdiler. Projemiz [kısa özet]. Teşekkürler!"
+2. **Sipariş İptali**
+   - API Metodu: `DELETE /orders/{orderId}`
+   - Demo: Mevcut siparişin iptal edilmesi
 
----
+3. **Sipariş Güncelleme**
+   - API Metodu: `PUT /orders/{orderId}`
+   - Demo: Sipariş adres bilgisinin güncellenmesi
 
-## Sunum Hazırlık Kontrol Listesi
+4. **Sipariş Listeleme**
+   - API Metodu: `GET /orders`
+   - Demo: Kullanıcının geçmiş ve aktif siparişlerinin listelenmesi
 
-### Genel Hazırlık
-- [ ] Grup lideri açılış konuşmasını hazırladı
-- [ ] Her ekip üyesi kendi sunumunu hazırladı
-- [ ] Tüm gereksinimler çalışır durumda
-- [ ] Demo senaryoları hazırlandı
-- [ ] Test verileri ve hesaplar hazırlandı
+5. **Yorum Ekleme**
+   - API Metodu: `POST /products/{productId}/reviews`
+   - Demo: Satın alınan ürüne puan ve yorum eklenmesi
 
-### Teknik Hazırlık
-- [ ] Video kayıt cihazı/kamera hazır
-- [ ] Mikrofon kalitesi test edildi
-- [ ] Işıklandırma uygun
-- [ ] Arka plan düzenlendi
-- [ ] Ekran kayıt yazılımı hazır (demo için)
-
-### Kişisel Hazırlık
-- [ ] Her ekip üyesi kendi bölümünü prova etti
-- [ ] Konuşma süreleri kontrol edildi
-- [ ] Gereksinimler ezberlendi veya notlar hazırlandı
-- [ ] Demo akışı prova edildi
+6. **Yorum Silme**
+   - API Metodu: `DELETE /products/{productId}/reviews/{reviewId}`
+   - Demo: Kullanıcının kendi yorumunu silmesi
 
 ---
 
-## Video Çekim Teknikleri
+#### Dilan Günsili
+**Kişisel Tanıtım:**
+- İsim: Dilan Günsili
+- Rol: Sepet İşlemleri & Yorum Güncelleme/Listeleme
 
-### Kişisel Tanıtım Bölümü
-- **Kamera Açısı:** Yüz net görünecek şekilde
-- **Işık:** Yüzün iyi aydınlatıldığından emin olun
-- **Arka Plan:** Temiz ve profesyonel görünüm
-- **Görüntü:** Omuz üstü çekim
-- **Göz Teması:** Kameraya bakarak konuşun
+**Gereksinimler:**
+1. **Sepete Ürün Ekleme**
+   - API Metodu: `POST /cart/items`
+   - Demo: Ürünün sepete eklenmesi
 
-### Demo Bölümü
-- **Ekran Kaydı:** Net ve yüksek çözünürlükte
-- **Ses:** Demo sırasında açıklama yapın
-- **Hız:** Yavaş ve anlaşılır hareket edin
-- **Vurgu:** Önemli noktaları işaret edin
+2. **Sepetten Ürün Silme**
+   - API Metodu: `DELETE /cart/items/{itemId}`
+   - Demo: Ürünün sepetten kaldırılması
+
+3. **Sepet Güncelleme**
+   - API Metodu: `PUT /cart/items/{itemId}`
+   - Demo: Sepetteki ürün miktarının değiştirilmesi
+
+4. **Sepet Listeleme**
+   - API Metodu: `GET /cart`
+   - Demo: Sepetteki tüm ürünlerin listelenmesi
+
+5. **Yorum Güncelleme**
+   - API Metodu: `PUT /products/{productId}/reviews/{reviewId}`
+   - Demo: Mevcut yorumun içerik veya puanının güncellenmesi
+
+6. **Yorum Listeleme**
+   - API Metodu: `GET /products/{productId}/reviews`
+   - Demo: Bir ürüne ait tüm yorumların listelenmesi
 
 ---
 
-## Zaman Yönetimi
-
-- **Grup Lideri Açılış:** 1-2 dakika
-- **Her Ekip Üyesi:** 4-6 dakika
-  - Kişisel tanıtım: 30-45 saniye
-  - Gereksinim sunumu: 3.5-5 dakika
-    - Her gereksinim için: yaklaşık 1-1.5 dakika
-- **Grup Lideri Kapanış:** 1-2 dakika
-- **Toplam Süre:** Yaklaşık 30-40 dakika (5 kişilik ekip için)

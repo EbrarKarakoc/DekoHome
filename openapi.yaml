@@ -20,6 +20,8 @@ info:
 servers:
   - url: http://localhost:3000/v1
     description: Yerel geliştirme sunucusu
+  - url: https://dekohome-api.onrender.com/v1
+    description: Domain Linki
 tags:
   - name: Kimlik Doğrulama
     description: Kullanıcı kayıt ve giriş işlemleri

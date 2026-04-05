@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key_change_me_in_pr
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, ad, soyad } = req.body;
+    const { email, password, ad, soyad, role } = req.body;
 
     if (!email || !password || !ad || !soyad) {
       return res.status(400).json({ message: "Tüm alanları doldurunuz" });
@@ -27,7 +27,8 @@ router.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
       ad,
-      soyad
+      soyad,
+      role: role === 'admin' ? 'admin' : 'user'
     });
 
     await user.save();
@@ -69,9 +70,9 @@ router.post("/login", async (req, res) => {
     );
 
     res.json({ token });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Sunucu hatası" });
+    res.status(500).json({ message: "Sunucu hatası", error: error.message });
   }
 });
 

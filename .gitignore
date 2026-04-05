@@ -1,6 +1,4 @@
-# OS files
 .DS_Store
-
 # Logs
 logs
 *.log
@@ -29,6 +27,7 @@ coverage
 
 # Dependency directories
 node_modules/
+package-lock.json
 jspm_packages/
 bower_components
 

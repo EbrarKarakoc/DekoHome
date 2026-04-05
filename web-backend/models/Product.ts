@@ -19,12 +19,17 @@ const productSchema = new mongoose.Schema({
     ref: 'Category',
     required: [true, 'Lütfen kategori seçiniz'],
   },
+  images: {
+    type: [String],
+    default: ['https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80']
+  },
   imageUrl: {
     type: String,
-    default: 'https://picsum.photos/seed/furniture/400/400',
+    default: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
   },
   stock: {
     type: Number,
+    required: [true, 'Lütfen stok miktarını giriniz'],
     default: 10,
   },
   ratings: {
