@@ -2,10 +2,11 @@
 
 ## Sunum Videosu
 
+>**Dilan Günsili - Gereksinim Videosu:** [https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj](https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj)
 > **Gülnihal Köse - Gereksinim Videosu:** [https://youtu.be/DV2jWF2q54k](https://youtu.be/DV2jWF2q54k)  
 > **Şerife Nur Yılmaz - Gereksinim Videosu:** [https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05](https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05) (Video)
 > **Ebrar Karakoç - Gereksinim Videosu:** [https://youtu.be/bJPQqyBqfGs](https://youtu.be/bJPQqyBqfGs)
->**Dilan Günsili - Gereksinim Videosu:** [https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj](https://youtu.be/E1DHQ14ZKjQ?si=_FaVOW9ZlWSp_HTj)
+
 ---
 
 ## Sunum Yapısı
