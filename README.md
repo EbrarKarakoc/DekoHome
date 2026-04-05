@@ -52,8 +52,7 @@ DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atab
 
 | Servis | Adres |
 |--------|-------|
-| 🔗 REST API | [dekohome-api.onrender.com](https://dekohome-api.onrender.com) |
-| 🌐 Web Frontend | [dekohome.onrender.com](https://dekohome.onrender.com) |
+| 🔗 REST API & Web | [dekohome-api.onrender.com](https://dekohome-api.onrender.com) |
 | 📁 GitHub | [github.com/EbrarKarakoc/DekoHome](https://github.com/EbrarKarakoc/DekoHome) |
 
 ---
