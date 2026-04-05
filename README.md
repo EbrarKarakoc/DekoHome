@@ -8,7 +8,7 @@
 
 ![DekoHome Banner](https://img.shields.io/badge/DekoHome-by%20Meyran-FF6B35?style=for-the-badge&logo=home-assistant&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Web%20%26%20Mobil-4ECDC4?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Geliştiriliyor-FFE66D?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Tamamlandı-28A745?style=for-the-badge)
 
 > *Evinizi hayal ettiğiniz gibi tasarlayın.*
 
@@ -52,9 +52,9 @@ DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atab
 
 | Servis | Adres |
 |--------|-------|
-| REST API | `dekohome-api.onrender.com` |(https://dekohome-api.onrender.com)|
-| Web Frontend | `frontend.yazmuh.com` |
-| GitHub | [github.com/EbrarKarakoc/DekoHome](https://github.com/EbrarKarakoc/DekoHome) |
+| 🔗 REST API | [dekohome-api.onrender.com](https://dekohome-api.onrender.com) |
+| 🌐 Web Frontend | [dekohome.onrender.com](https://dekohome.onrender.com) |
+| 📁 GitHub | [github.com/EbrarKarakoc/DekoHome](https://github.com/EbrarKarakoc/DekoHome) |
 
 ---
 
@@ -64,10 +64,10 @@ DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atab
 
 | İsim | Sorumluluk |
 |------|------------|
-| Gülnihal Köse | Kullanıcı İşlemleri & Kategori Ekleme/Silme |
-| Şerife Nur Yılmaz | Kategori İşlemleri & Ürün Güncelleme/Listeleme |
-| Ebrar Karakoç | Sipariş İşlemleri & Yorum Ekleme/Silme |
-| Dilan Günsili | Sepet İşlemleri & Yorum Güncelleme/Listeleme |
+| Gülnihal Köse | Kullanıcı İşlemleri & Kategori Tercihleri (Ekleme/Silme) |
+| Şerife Nur Yılmaz | Ürün İşlemleri & Kategori (Güncelleme/Listeleme) |
+| Ebrar Karakoç | Sipariş İşlemleri & Yorum Yönetimi (Ekleme/Silme) |
+| Dilan Günsili | Sepet İşlemleri & Yorum Yönetimi (Güncelleme/Listeleme) |
 
 ---
 
@@ -79,9 +79,10 @@ Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
 - [REST API Tasarımı](API-Tasarimi.md)
 - [REST API Metotları](Rest-API.md)
 - [Web Back-End](WebBackEnd.md)
-- Mobil Front-End
-- Mobil Backend
-- Video Sunum
+- [Web Front-End](WebFrontEnd.md)
+- [Mobil Front-End](MobilFrontEnd.md)
+- [Mobil Backend](MobilBackEnd.md)
+- [Video Sunum](Sunum.md)
 
 ---
 
