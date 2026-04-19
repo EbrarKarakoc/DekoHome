@@ -8,47 +8,59 @@ Bu dokümanda, mobil uygulamanın REST API ile iletişimini sağlayan backend en
 
 ## Grup Üyelerinin Mobil Backend Görevleri
 
-1. [Ali Tutar'ın Mobil Backend Görevleri](Ali-Tutar/Ali-Tutar-Mobil-Backend-Gorevleri.md)
-2. [Grup Üyesi 2'nin Mobil Backend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Mobil-Backend-Gorevleri.md)
-3. [Grup Üyesi 3'ün Mobil Backend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Mobil-Backend-Gorevleri.md)
-4. [Grup Üyesi 4'ün Mobil Backend Görevleri](Grup-Uyesi-4/Grup-Uyesi-4-Mobil-Backend-Gorevleri.md)
-5. [Grup Üyesi 5'in Mobil Backend Görevleri](Grup-Uyesi-5/Grup-Uyesi-5-Mobil-Backend-Gorevleri.md)
-6. [Grup Üyesi 6'nın Mobil Backend Görevleri](Grup-Uyesi-6/Grup-Uyesi-6-Mobil-Backend-Gorevleri.md)
+1. [Dilan Günsili'nin Mobil Backend Görevleri](Dilan-Günsili/Dilan-Günsili-Mobil-Backend-Gorevleri.md)
+2. [Gülnihal Köse'nin Mobil Backend Görevleri](Gülnihal-Köse/Gülnihal-Köse-Mobil-Backend-Gorevleri.md)
+3. [Ebrar Karakoç'un Mobil Backend Görevleri](Ebrar-Karakoc/Ebrar-Karakoc-Mobil-Backend-Gorevleri.md)
+4. [Şerife Nur Yılmaz'ın Mobil Backend Görevleri](Şerife-Nur-Yılmaz/Şerife-Nur-Yılmaz-Mobil-Backend-Gorevleri.md)
 
 ---
 
 ## Genel Mobil Backend Prensipleri
 
 ### 1. HTTP Client Yapılandırması
-- **Base URL:** `https://api.yazmuh.com/v1`
-- **Timeout:** Request timeout 30 saniye, connect timeout 10 saniye
+- **Base URL:** `https://dekohome-api.onrender.com/v1`
+- **Base URL geliştirme ortamında Android için:** `http://10.0.2.2:3000/v1`
+- **Base URL geliştirme ortamında iOS/Web için:** `http://localhost:3000/v1`
+- **Timeout:** 15 saniye
 - **Headers:** 
   - `Content-Type: application/json`
   - `Authorization: Bearer {token}` (gerekli endpoint'lerde)
 
 ### 2. Authentication Yönetimi
-- JWT token'ları secure storage'da saklama
-- Token refresh mekanizması implementasyonu
-- Otomatik token yenileme (401 durumunda)
-- Logout durumunda token temizleme
+- JWT token secure storage mantığıyla saklanır
+- Web ortamında secure storage yerine AsyncStorage fallback kullanılır
+- 401 durumunda token silinir ve unauthorized handler tetiklenir
+- Logout akışında token temizleme uygulanır
 
 ### 3. Error Handling
-- Network hataları (timeout, connection error)
-- HTTP status kodlarına göre uygun mesajlar gösterme
-- Retry mekanizması (network hatalarında)
-- Offline durum yönetimi
+- Axios tabanlı hata yakalama kullanılır
+- Network Error ve timeout durumları kullanıcı dostu bağlantı mesajına çevrilir
+- Sunucudan dönen message alanı öncelikli gösterilir
+- Bilinmeyen hatalarda genel hata mesajı gösterilir
+- Query seviyesinde retry mekanizması varsayılan olarak 2 denemedir
 
 ### 4. Caching Stratejisi
-- GET istekleri için response caching
-- Cache invalidation (PUT/DELETE sonrası)
-- Offline-first yaklaşımı (mümkün olduğunda)
+- TanStack Query ile cache yönetimi kullanılır
+- Global query staleTime: 5 dakika
+- Modül bazlı staleTime örnekleri:
+- Cart: 30 saniye
+- User profile: 1 dakika
+- Mutation sonrası ilgili query keyler invalidate edilerek veri senkronizasyonu sağlanır
+- Offline-first tam senaryo yerine cache ve yeniden deneme odaklı yaklaşım kullanılır
 
 ### 5. Loading States
-- Request başlangıcında loading indicator
-- Başarılı/başarısız durum bildirimleri
-- Optimistic updates (kullanıcı deneyimi için)
+- Query ve mutation stateleri üzerinden loading yönetimi yapılır
+- Ekranlarda skeleton, empty state, error state bileşenleri kullanılır
+- İşlem başarılı/başarısız geri bildirimleri gösterilir
+- Sepet ve kullanıcı işlemlerinde optimistic davranışa uygun anlık UI güncellemeleri uygulanır
+
+### 6. Offline ve Bağlantı Durumu
+- Expo Network ile bağlantı durumu periyodik kontrol edilir
+- Her 5 saniyede bağlantı doğrulaması yapılır
+- Bağlantı yokken kullanıcıya OfflineBanner gösterilir
 
 ### 6. Logging ve Debugging
-- API request/response logging (development modunda)
-- Error logging ve crash reporting
-- Network interceptor kullanımı
+- Axios interceptor katmanında request öncesi token ekleme ve 401 yönetimi vardır
+- Merkezileştirilmiş request/response loglama sınırlıdır
+- Crash reporting entegrasyonu mevcut değildir
+- Backend tarafında hata durumlarında route bazlı loglama yapılır
