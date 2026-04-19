@@ -6,9 +6,11 @@ import path from "path";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import productRoutes from "./routes/products.js";
+import categoryRoutes from "./routes/categories.js";
 import userRoutes from "./routes/users.js";
 import cartRoutes from "./routes/cart.js";
 import orderRoutes from "./routes/orders.js";
+import reviewRoutes from "./routes/reviews.js";
 import { connectDB } from "./config/db.js";
 
 // Load environment variables
@@ -22,14 +24,41 @@ async function startServer() {
   const PORT = parseInt(process.env.PORT || "3000", 10);
 
   // Middleware
-  app.use(cors({
-    origin: [
-      'https://dekohome-api.onrender.com',
-      'http://localhost:3000',
-      'http://localhost:24679',
-    ],
-    credentials: true,
-  }));
+  const allowedOrigins = new Set([
+    'https://dekohome-api.onrender.com',
+    'http://localhost:3000',
+    'http://localhost:24679',
+    'http://localhost:8081',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:24679',
+    'http://127.0.0.1:8081',
+  ]);
+
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // Native clients may send no Origin header.
+        if (!origin) {
+          callback(null, true);
+          return;
+        }
+
+        if (allowedOrigins.has(origin)) {
+          callback(null, true);
+          return;
+        }
+
+        // Keep dev experience smooth: allow any localhost / loopback port.
+        if (/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+          callback(null, true);
+          return;
+        }
+
+        callback(new Error('Not allowed by CORS'));
+      },
+      credentials: true,
+    })
+  );
   app.use(express.json());
 
   // API Routes
@@ -47,8 +76,10 @@ async function startServer() {
   app.use("/v1/auth", authRoutes);
   app.use("/v1/users", userRoutes);
   app.use("/v1/products", productRoutes);
+  app.use("/v1/categories", categoryRoutes);
   app.use("/v1/cart", cartRoutes);
   app.use("/v1/orders", orderRoutes);
+  app.use("/v1/reviews", reviewRoutes);
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
