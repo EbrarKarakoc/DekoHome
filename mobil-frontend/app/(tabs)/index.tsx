@@ -114,7 +114,7 @@ export default function TabsHomeScreen() {
 
             <View style={{ marginTop: 18, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ color: Colors.text, fontWeight: '700' }}>One Cikan Urunler</Text>
-              <Pressable onPress={() => router.push('/(tabs)/search')}>
+              <Pressable onPress={() => router.push('/tabs/search')}>
                 <Text style={{ color: Colors.primary, fontWeight: '600' }}>Tumunu goster</Text>
               </Pressable>
             </View>

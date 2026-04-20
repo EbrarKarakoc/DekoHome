@@ -20,7 +20,7 @@ export function useAuth() {
       await login(response.token);
       await hapticSuccess();
       showMessage({ message: 'Hos geldiniz!', type: 'success' });
-      router.replace('/(tabs)');
+      router.replace('/tabs');
     } catch (error) {
       await hapticError();
       showMessage({ message: getErrorMessage(error), type: 'danger' });
