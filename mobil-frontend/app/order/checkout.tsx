@@ -80,7 +80,7 @@ export default function CheckoutScreen() {
           title="Sepet bos"
           description="Siparis olusturmak icin sepetinize urun ekleyin."
         />
-        <Pressable onPress={() => router.replace('/tabs/cart')}>
+        <Pressable onPress={() => router.replace('/(tabs)/cart')}>
           <Text style={{ color: Colors.primary, fontWeight: '700', marginTop: 14 }}>Sepete don</Text>
         </Pressable>
       </View>

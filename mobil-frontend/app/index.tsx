@@ -6,7 +6,7 @@ export default function EntryScreen() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   if (isAuthenticated) {
-    return <Redirect href="/tabs" />;
+    return <Redirect href="/(tabs)" />;
   }
 
   return <Redirect href="/(auth)/login" />;
