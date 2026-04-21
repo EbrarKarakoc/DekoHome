@@ -1,100 +1,59 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { useEffect } from 'react';
-import { Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import { Home, Search, ShoppingBag, User } from 'lucide-react-native';
+import { Platform, View } from 'react-native';
 
-import Colors from '@constants/colors';
-import { useCartStore } from '@store/cartStore';
-
-function AnimatedCartIcon({ color, size, itemCount }: { color: string; size: number; itemCount: number }) {
-  const scale = useSharedValue(1);
-
-  useEffect(() => {
-    if (itemCount <= 0) {
-      return;
-    }
-
-    scale.value = withSequence(withTiming(1.25, { duration: 120 }), withTiming(1, { duration: 140 }));
-  }, [itemCount, scale]);
-
-  const badgeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <View>
-      <Ionicons color={color} name="bag-outline" size={size} />
-      {itemCount > 0 ? (
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              top: -6,
-              right: -10,
-              minWidth: 18,
-              height: 18,
-              borderRadius: 999,
-              backgroundColor: Colors.primary,
-              alignItems: 'center',
-              justifyContent: 'center',
-              paddingHorizontal: 4,
-            },
-            badgeStyle,
-          ]}
-        >
-          <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '700' }}>
-            {itemCount > 99 ? '99+' : itemCount}
-          </Text>
-        </Animated.View>
-      ) : null}
-    </View>
-  );
-}
-
-export default function TabsLayout() {
-  const itemCount = useCartStore((state) => state.itemCount);
-
+export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
+        tabBarActiveTintColor: '#D48806', // Mustard
+        tabBarInactiveTintColor: '#94a3b8', // Slate-400
         tabBarStyle: {
-          backgroundColor: Colors.surface,
-          borderTopColor: Colors.border,
-          height: 60,
-          paddingBottom: 6,
+          backgroundColor: '#0f172a', // Slate-900
+          borderTopWidth: 0,
+          boxShadow: [{ color: 'rgba(0, 0, 0, 0.1)', offsetX: 0, offsetY: -4, blurRadius: 12 }],
+          height: Platform.OS === 'ios' ? 88 : 68,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 12,
+          paddingTop: 12,
+        },
+        tabBarLabelStyle: {
+          fontFamily: 'Inter_700Bold',
+          fontSize: 10,
+          marginTop: 4,
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Ana Sayfa',
-          tabBarIcon: ({ color, size }) => <Ionicons color={color} name="home-outline" size={size} />,
+          title: 'Keşfet',
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="categories"
         options={{
-          title: 'Kesfet',
-          tabBarIcon: ({ color, size }) => <Ionicons color={color} name="search-outline" size={size} />,
+          title: 'Kategoriler',
+          tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
-          title: 'Sepet',
-          tabBarIcon: ({ color, size }) => <AnimatedCartIcon color={color} size={size} itemCount={itemCount} />,
+          title: 'Sepetim',
+          tabBarIcon: ({ color, size }) => (
+            <View className="relative">
+              <ShoppingBag size={size} color={color} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
-          tabBarIcon: ({ color, size }) => <Ionicons color={color} name="person-outline" size={size} />,
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />
     </Tabs>

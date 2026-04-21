@@ -82,7 +82,7 @@ export interface ProductsResponse {
 
 export interface ProductFilters {
   q?: string;
-  categoryId?: string;
+  categoryId?: string | string[];
   minPrice?: number;
   maxPrice?: number;
   page?: number;

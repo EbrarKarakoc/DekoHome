@@ -205,12 +205,34 @@ router.get('/', async (req, res) => {
     }
     
     if (categoryId) {
-      if (mongoose.Types.ObjectId.isValid(categoryId as string)) {
-        query.categoryId = categoryId;
-      } else {
-        // Fallback: search by name if ID is not a valid ObjectId (useful for Postman testing)
-        const cat = await Category.findOne({ name: categoryId });
-        if (cat) query.categoryId = cat._id;
+      const categoryIds = Array.isArray(categoryId) 
+        ? categoryId 
+        : (typeof categoryId === 'string' && categoryId.includes(',') ? categoryId.split(',') : [categoryId]);
+
+      const validObjectIds: string[] = [];
+      const namesToSearch: string[] = [];
+      
+      categoryIds.forEach((cat: any) => {
+        const catStr = String(cat).trim();
+        if (mongoose.Types.ObjectId.isValid(catStr)) {
+          validObjectIds.push(catStr);
+        } else {
+          namesToSearch.push(catStr);
+        }
+      });
+
+      const finalIds: string[] = [...validObjectIds];
+      if (namesToSearch.length > 0) {
+        const cats = await Category.find({ name: { $in: namesToSearch } });
+        cats.forEach(c => finalIds.push(c._id.toString()));
+      }
+
+      if (finalIds.length > 0) {
+        if (finalIds.length === 1) {
+          query.categoryId = finalIds[0];
+        } else {
+          query.categoryId = { $in: finalIds };
+        }
       }
     }
     

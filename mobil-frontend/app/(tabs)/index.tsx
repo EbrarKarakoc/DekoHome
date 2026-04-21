@@ -1,131 +1,107 @@
-import { router } from 'expo-router';
-import { useMemo } from 'react';
-import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Search, ShoppingBag, Bell, ChevronRight, Sparkles, User } from 'lucide-react-native';
+import { useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Pressable,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  View,
+  Platform,
+} from 'react-native';
 
-import { EmptyState } from '@components/common/EmptyState';
-import { ErrorMessage } from '@components/common/ErrorMessage';
-import { CategoryChip } from '@components/layout/CategoryChip';
-import { ProductCard } from '@components/product/ProductCard';
-import { ProductSkeleton } from '@components/product/ProductSkeleton';
-import Colors from '@constants/colors';
+import CategoryChip from '@components/layout/CategoryChip';
+import ProductCard from '@components/product/ProductCard';
+import HeroSlider from '@components/layout/HeroSlider';
+import CategoryGrid from '@components/layout/CategoryGrid';
+import Footer from '@components/layout/Footer';
+import WebHeader from '@components/layout/WebHeader';
 import { useCategories } from '@hooks/useCategories';
-import { useProducts } from '@hooks/useProducts';
-import type { Category } from '@/types';
-import { getErrorMessage } from '@utils/error';
+import { useInfiniteProducts } from '@hooks/useProducts';
 
-function flattenCategories(items: Category[]): Category[] {
-  const output: Category[] = [];
+export default function HomeScreen() {
+  const router = useRouter();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
-  for (const item of items) {
-    output.push(item);
-    if (item.children?.length) {
-      output.push(...flattenCategories(item.children));
-    }
-  }
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
 
-  return output;
-}
+  const {
+    data: productsData,
+    isLoading: isProductsLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    isRefetching,
+    refetch,
+  } = useInfiniteProducts({
+    categoryId: selectedCategoryId || undefined,
+    limit: 10,
+  });
 
-export default function TabsHomeScreen() {
-  const categoriesQuery = useCategories();
-  const productsQuery = useProducts({ limit: 6 });
+  const products = useMemo(() => {
+    return productsData?.pages.flatMap((page) => page.products) ?? [];
+  }, [productsData]);
 
-  const categories = useMemo(
-    () => flattenCategories(categoriesQuery.data ?? []).filter((item) => !!(item.id ?? item._id)),
-    [categoriesQuery.data]
-  );
+  const renderHeader = () => (
+    <View className="bg-white">
+      <WebHeader />
 
-  const products = productsQuery.data?.products ?? [];
+      {/* Hero Slider Section */}
+      <HeroSlider />
 
-  const isLoading = categoriesQuery.isLoading || productsQuery.isLoading;
-  const isRefreshing = categoriesQuery.isRefetching || productsQuery.isRefetching;
+      {/* Categories Grid Section */}
+      <CategoryGrid />
 
-  const onRefresh = async () => {
-    await Promise.all([categoriesQuery.refetch(), productsQuery.refetch()]);
-  };
-
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, backgroundColor: Colors.background, padding: 16, gap: 12 }}>
-        <View style={{ height: 16, width: 160, borderRadius: 999, backgroundColor: '#E5E7EB' }} />
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={{ height: 34, width: 92, borderRadius: 999, backgroundColor: '#E5E7EB' }} />
-          <View style={{ height: 34, width: 84, borderRadius: 999, backgroundColor: '#E5E7EB' }} />
-          <View style={{ height: 34, width: 104, borderRadius: 999, backgroundColor: '#E5E7EB' }} />
-        </View>
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          <ProductSkeleton />
-          <ProductSkeleton />
-        </View>
+      {/* Featured Products Header */}
+      <View className="px-6 mb-8 mt-4 items-center">
+        <Text className="font-playfair text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">Öne Çıkan Ürünler</Text>
+        <View className="h-1 w-16 bg-[#D48806] rounded-full mt-3" />
       </View>
-    );
-  }
-
-  if (categoriesQuery.isError || productsQuery.isError) {
-    return (
-      <View style={{ flex: 1, backgroundColor: Colors.background, padding: 16, justifyContent: 'center' }}>
-        <ErrorMessage
-          message={getErrorMessage(categoriesQuery.error ?? productsQuery.error)}
-          onRetry={async () => {
-            await onRefresh();
-          }}
-        />
-      </View>
-    );
-  }
-
-  return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <FlatList
-        contentContainerStyle={{ padding: 16, paddingBottom: 30 }}
-        data={products}
-        keyExtractor={(item) => item.id ?? item._id ?? item.name}
-        numColumns={2}
-        columnWrapperStyle={{ gap: 12 }}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-        ListHeaderComponent={
-          <View style={{ marginBottom: 14 }}>
-            <Text style={{ fontSize: 26, fontWeight: '700', color: Colors.text }}>DekoHome</Text>
-            <Text style={{ marginTop: 4, color: Colors.textSecondary }}>
-              One cikan urunleri ve kategorileri kesfedin.
-            </Text>
-
-            <Text style={{ marginTop: 16, marginBottom: 10, color: Colors.text, fontWeight: '700' }}>
-              Kategoriler
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 10, paddingRight: 10 }}
-            >
-              {categories.map((category) => {
-                const categoryId = category.id ?? category._id;
-                if (!categoryId) return null;
-
-                return (
-                  <CategoryChip
-                    key={categoryId}
-                    label={category.name}
-                    onPress={() => router.push(`/category/${categoryId}`)}
-                  />
-                );
-              })}
-            </ScrollView>
-
-            <View style={{ marginTop: 18, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ color: Colors.text, fontWeight: '700' }}>One Cikan Urunler</Text>
-              <Pressable onPress={() => router.push('/(tabs)/search')}>
-                <Text style={{ color: Colors.primary, fontWeight: '600' }}>Tumunu goster</Text>
-              </Pressable>
-            </View>
-          </View>
-        }
-        ListEmptyComponent={
-          <EmptyState icon="storefront-outline" title="Urun bulunamadi" description="Su an gosterilecek urun yok." />
-        }
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
-        renderItem={({ item }) => <ProductCard product={item} />}
-      />
     </View>
   );
+
+  return (
+    <SafeAreaView
+      className="flex-1 bg-white"
+      style={Platform.OS === 'web' ? ({ flex: 1, height: '100vh', display: 'flex' } as any) : undefined}
+    >
+      <StatusBar barStyle="dark-content" />
+      <FlatList
+        data={products}
+        keyExtractor={(item, index) => item.id ?? item._id ?? String(index)}
+        renderItem={({ item }) => <ProductCard product={item} />}
+        ListHeaderComponent={renderHeader}
+        numColumns={2}
+        columnWrapperStyle={{ paddingHorizontal: 16, gap: 16 }}
+        contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 40 : 0 }}
+        style={Platform.OS === 'web' ? ({ flex: 1, overflowY: 'auto' } as any) : undefined}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#D48806" />
+        }
+        onEndReached={() => hasNextPage && fetchNextPage()}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          <>
+            {isFetchingNextPage && <ActivityIndicator className="py-8" color="#D48806" />}
+            {!hasNextPage && products.length > 0 && <Footer />}
+          </>
+        }
+        ListEmptyComponent={
+          !isProductsLoading ? (
+            <View className="flex-1 items-center justify-center py-20 bg-slate-50 mx-6 rounded-3xl border border-dashed border-slate-200">
+              <Text className="text-slate-400 font-inter">Henüz ürün bulunamadı.</Text>
+            </View>
+          ) : (
+            <ActivityIndicator className="mt-20" color="#D48806" />
+          )
+        }
+      />
+    </SafeAreaView>
+  );
 }
+

@@ -23,8 +23,8 @@ router.get('/:userId', authenticate, async (req: AuthRequest, res) => {
       ad: user.ad,
       soyad: user.soyad
     });
-  } catch (error) {
-    res.status(500).json({ message: 'Sunucu hatası' });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Sunucu hatası: ' + error.message });
   }
 });
 
@@ -57,8 +57,8 @@ router.put('/:userId', authenticate, async (req: AuthRequest, res) => {
       ad: user.ad,
       soyad: user.soyad
     });
-  } catch (error) {
-    res.status(400).json({ message: 'Geçersiz istek verisi' });
+  } catch (error: any) {
+    res.status(400).json({ message: 'Geçersiz istek verisi: ' + error.message });
   }
 });
 
@@ -74,9 +74,12 @@ router.delete('/:userId', authenticate, async (req: AuthRequest, res) => {
       return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
     }
 
+    // Clean up related preferences
+    await UserCategoryPreference.deleteMany({ userId: req.params.userId });
+
     res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: 'Sunucu hatası' });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Sunucu hatası: ' + error.message });
   }
 });
 
@@ -128,8 +131,8 @@ router.delete('/:userId/preferences/categories/:categoryId', authenticate, async
     }
 
     res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: 'Sunucu hatası' });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Sunucu hatası: ' + error.message });
   }
 });
 

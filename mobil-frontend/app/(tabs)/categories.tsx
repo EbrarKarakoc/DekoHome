@@ -11,8 +11,8 @@ import {
 
 import { EmptyState } from '@components/common/EmptyState';
 import { ErrorMessage } from '@components/common/ErrorMessage';
-import { CategoryChip } from '@components/layout/CategoryChip';
-import { ProductCard } from '@components/product/ProductCard';
+import CategoryChip from '@components/layout/CategoryChip';
+import ProductCard from '@components/product/ProductCard';
 import { ProductSkeleton } from '@components/product/ProductSkeleton';
 import Colors from '@constants/colors';
 import { useCategories } from '@hooks/useCategories';
@@ -33,10 +33,10 @@ function flattenCategories(items: Category[]): Category[] {
   return output;
 }
 
-export default function SearchScreen() {
+export default function CategoriesScreen() {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(undefined);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [minPriceText, setMinPriceText] = useState('');
   const [maxPriceText, setMaxPriceText] = useState('');
 
@@ -56,11 +56,11 @@ export default function SearchScreen() {
 
     return {
       q: debouncedQuery || undefined,
-      categoryId: selectedCategoryId,
+      categoryId: selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
       minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
       maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
     };
-  }, [debouncedQuery, selectedCategoryId, minPriceText, maxPriceText]);
+  }, [debouncedQuery, selectedCategoryIds, minPriceText, maxPriceText]);
 
   const productsQuery = useInfiniteProducts(filters);
 
@@ -179,9 +179,9 @@ export default function SearchScreen() {
               contentContainerStyle={{ gap: 10, marginTop: 12, paddingBottom: 4 }}
             >
               <CategoryChip
-                label="Tum Kategoriler"
-                selected={!selectedCategoryId}
-                onPress={() => setSelectedCategoryId(undefined)}
+                name="Tüm Ürünler"
+                isActive={selectedCategoryIds.length === 0}
+                onPress={() => setSelectedCategoryIds([])}
               />
               {categories.map((category) => {
                 const categoryId = category.id ?? category._id;
@@ -190,9 +190,15 @@ export default function SearchScreen() {
                 return (
                   <CategoryChip
                     key={categoryId}
-                    label={category.name}
-                    selected={selectedCategoryId === categoryId}
-                    onPress={() => setSelectedCategoryId(categoryId)}
+                    name={category.name}
+                    isActive={selectedCategoryIds.includes(categoryId)}
+                    onPress={() => {
+                      setSelectedCategoryIds((prev) => 
+                        prev.includes(categoryId) 
+                          ? prev.filter((id) => id !== categoryId) 
+                          : [...prev, categoryId]
+                      );
+                    }}
                   />
                 );
               })}

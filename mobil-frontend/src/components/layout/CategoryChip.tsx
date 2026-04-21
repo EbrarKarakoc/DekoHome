@@ -1,28 +1,27 @@
 import { Pressable, Text } from 'react-native';
 
-import Colors from '@constants/colors';
-
 interface CategoryChipProps {
-  label: string;
-  selected?: boolean;
-  onPress?: () => void;
+  name: string;
+  isActive: boolean;
+  onPress: () => void;
 }
 
-export function CategoryChip({ label, selected = false, onPress }: CategoryChipProps) {
+export default function CategoryChip({ name, isActive, onPress }: CategoryChipProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={{
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        borderRadius: 999,
-        borderWidth: 1,
-        borderColor: selected ? Colors.primary : Colors.border,
-        backgroundColor: selected ? '#FEF3C7' : Colors.surface,
-      }}
+      className={`px-6 py-2.5 rounded-full mr-3 border ${
+        isActive 
+          ? 'bg-primary-600 border-primary-600 shadow-md shadow-primary-600/20' 
+          : 'bg-white border-slate-200'
+      }`}
     >
-      <Text style={{ color: selected ? Colors.primaryDark : Colors.text, fontSize: 13, fontWeight: '600' }}>
-        {label}
+      <Text
+        className={`text-xs font-inter-bold transition-all ${
+          isActive ? 'text-white' : 'text-slate-500'
+        }`}
+      >
+        {name}
       </Text>
     </Pressable>
   );

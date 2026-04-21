@@ -1,451 +1,241 @@
-import { Redirect, router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
+import { useRouter } from 'expo-router';
+import { 
+  User, 
+  Camera, 
+  Mail,
+  Trash2,
+  Info,
+  Package,
+  Lock
+} from 'lucide-react-native';
+import { 
+  Image, 
+  Pressable, 
+  ScrollView, 
+  Text, 
+  View, 
+  SafeAreaView,
   TextInput,
-  View,
+  Alert,
+  Platform,
+  ActivityIndicator
 } from 'react-native';
-import { showMessage } from 'react-native-flash-message';
+import { useState } from 'react';
 
-import { EmptyState } from '@components/common/EmptyState';
-import { ErrorMessage } from '@components/common/ErrorMessage';
-import Colors from '@constants/colors';
-import { useAuth } from '@hooks/useAuth';
-import { useCategories } from '@hooks/useCategories';
-import {
-  useAddCategoryPreference,
-  useCategoryPreferences,
-  useDeleteAccount,
-  useRemoveCategoryPreference,
-  useUpdateUserProfile,
-  useUserProfile,
-} from '@hooks/useUsers';
 import { useAuthStore } from '@store/authStore';
-import type { Category } from '@/types';
+import { usersApi } from '@api/users';
 import { getErrorMessage } from '@utils/error';
-import { hapticError, hapticSuccess, hapticTap } from '@utils/haptics';
-
-function flattenCategories(items: Category[]): Category[] {
-  const output: Category[] = [];
-
-  for (const item of items) {
-    output.push(item);
-    if (item.children?.length) {
-      output.push(...flattenCategories(item.children));
-    }
-  }
-
-  return output;
-}
+import WebHeader from '@components/layout/WebHeader';
 
 export default function ProfileScreen() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const user = useAuthStore((state) => state.user);
-  const setUser = useAuthStore((state) => state.setUser);
-  const { handleLogout } = useAuth();
-  const [ad, setAd] = useState('');
-  const [soyad, setSoyad] = useState('');
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const router = useRouter();
+  const { user, setUser, logout } = useAuthStore();
 
-  const userId = user?.id ?? '';
-  const canFetch = isAuthenticated && !!userId;
+  const [ad, setAd] = useState(user?.ad || '');
+  const [soyad, setSoyad] = useState(user?.soyad || '');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const userQuery = useUserProfile(userId, canFetch);
-  const categoriesQuery = useCategories();
-  const preferencesQuery = useCategoryPreferences(userId, canFetch);
-
-  const updateProfileMutation = useUpdateUserProfile(userId);
-  const addPreferenceMutation = useAddCategoryPreference(userId);
-  const removePreferenceMutation = useRemoveCategoryPreference(userId);
-  const deleteAccountMutation = useDeleteAccount(userId);
-
-  const categories = useMemo(() => {
-    const flattened = flattenCategories(categoriesQuery.data ?? []);
-    return flattened.filter((item) => !!(item.id ?? item._id));
-  }, [categoriesQuery.data]);
-
-  const selectedCategoryIds = preferencesQuery.data ?? [];
-
-  useEffect(() => {
-    const profile = userQuery.data;
-    if (!profile) {
-      return;
-    }
-
-    const mergedRole = user?.role ?? profile.role;
-    setUser({ ...profile, role: mergedRole });
-    setAd(profile.ad);
-    setSoyad(profile.soyad);
-  }, [setUser, user?.role, userQuery.data]);
-
-  useEffect(() => {
-    if (userQuery.data) {
-      return;
-    }
-
-    if (user) {
-      setAd(user.ad);
-      setSoyad(user.soyad);
-    }
-  }, [user, userQuery.data]);
-
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
-  if (!userId) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
-  if (userQuery.isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
-        <ActivityIndicator color={Colors.primary} />
-      </View>
-    );
-  }
-
-  if (userQuery.isError) {
-    return (
-      <View style={{ flex: 1, backgroundColor: Colors.background, padding: 16, justifyContent: 'center' }}>
-        <ErrorMessage
-          message={getErrorMessage(userQuery.error)}
-          onRetry={async () => {
-            await userQuery.refetch();
-          }}
-        />
-      </View>
-    );
-  }
-
-  const isSavingProfile = updateProfileMutation.isPending;
-  const isUpdatingPreference = addPreferenceMutation.isPending || removePreferenceMutation.isPending;
-
-  const onSaveProfile = async () => {
-    const trimmedAd = ad.trim();
-    const trimmedSoyad = soyad.trim();
-
-    if (!trimmedAd || !trimmedSoyad) {
-      await hapticError();
-      showMessage({ message: 'Ad ve soyad alanlari zorunludur', type: 'warning' });
-      return;
-    }
-
+  const handleSave = async () => {
+    if (!user?.id) return;
+    
     try {
-      await hapticTap();
-      const updated = await updateProfileMutation.mutateAsync({ ad: trimmedAd, soyad: trimmedSoyad });
-      setUser({ ...updated, role: user?.role ?? updated.role });
-      await hapticSuccess();
-      showMessage({ message: 'Profil bilgileriniz guncellendi', type: 'success' });
-    } catch (error) {
-      await hapticError();
-      showMessage({ message: getErrorMessage(error), type: 'danger' });
-    }
-  };
-
-  const onToggleCategory = async (categoryId: string) => {
-    try {
-      await hapticTap();
-      if (selectedCategoryIds.includes(categoryId)) {
-        await removePreferenceMutation.mutateAsync(categoryId);
-        await hapticSuccess();
-        showMessage({ message: 'Kategori tercihi kaldirildi', type: 'success' });
+      setIsSaving(true);
+      const updatedUser = await usersApi.update(user.id, { ad, soyad });
+      setUser({ ...user, ad: updatedUser.ad, soyad: updatedUser.soyad });
+      
+      if (Platform.OS === 'web') {
+        window.alert("Bilgileriniz başarıyla güncellendi.");
       } else {
-        await addPreferenceMutation.mutateAsync(categoryId);
-        await hapticSuccess();
-        showMessage({ message: 'Kategori tercihi eklendi', type: 'success' });
+        Alert.alert("Başarılı", "Bilgileriniz başarıyla güncellendi.");
       }
     } catch (error) {
-      await hapticError();
-      showMessage({ message: getErrorMessage(error), type: 'danger' });
+      if (Platform.OS === 'web') {
+        window.alert(getErrorMessage(error));
+      } else {
+        Alert.alert("Hata", getErrorMessage(error));
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const onDeleteAccount = async () => {
-    try {
-      await hapticTap();
-      await deleteAccountMutation.mutateAsync();
-      setDeleteModalVisible(false);
-      await hapticSuccess();
-      showMessage({ message: 'Hesabiniz silindi', type: 'success' });
-      await handleLogout();
-    } catch (error) {
-      await hapticError();
-      showMessage({ message: getErrorMessage(error), type: 'danger' });
+  const handleNotImplemented = () => {
+    if (Platform.OS === 'web') {
+      window.alert("Bu bölüm henüz yapım aşamasındadır.");
+    } else {
+      Alert.alert("Bilgi", "Bu bölüm henüz yapım aşamasındadır.");
     }
+  };
+
+  const handleDeleteProfile = async () => {
+      if (!user?.id) return;
+
+      if (Platform.OS === 'web') {
+        const confirmed = window.confirm("Profilinizi tamamen silmek üzeresiniz. Bu işlem geri alınamaz. Onaylıyor musunuz?");
+        if (confirmed) {
+            try {
+              await usersApi.deleteAccount(user.id);
+              window.alert("Hesabınız silindi.");
+              await logout();
+              router.replace('/(auth)/login');
+            } catch (error) {
+              window.alert(getErrorMessage(error));
+            }
+        }
+        return;
+      }
+
+      Alert.alert(
+          "Hesabı Sil",
+          "Profilinizi tamamen silmek üzeresiniz. Bu işlem geri alınamaz. Onaylıyor musunuz?",
+          [
+              { text: "İptal", style: "cancel" },
+              { text: "Evet, Sil", style: "destructive", onPress: async () => {
+                 try {
+                   await usersApi.deleteAccount(user.id);
+                   Alert.alert("Başarılı", "Hesabınız silindi.");
+                   await logout();
+                   router.replace('/(auth)/login');
+                 } catch (error) {
+                   Alert.alert("Hata", getErrorMessage(error));
+                 }
+              }},
+          ]
+      );
   };
 
   return (
-    <>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: Colors.background }}
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={userQuery.isRefetching || categoriesQuery.isRefetching || preferencesQuery.isRefetching}
-            onRefresh={async () => {
-              await Promise.all([userQuery.refetch(), categoriesQuery.refetch(), preferencesQuery.refetch()]);
-            }}
-            tintColor={Colors.primary}
-          />
-        }
+    <SafeAreaView 
+      className="flex-1 bg-[#FAFAF9]"
+      style={Platform.OS === 'web' ? ({ flex: 1, height: '100vh', display: 'flex' } as any) : undefined}
+    >
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        className="flex-1"
+        style={Platform.OS === 'web' ? ({ flex: 1, overflowY: 'auto' } as any) : undefined}
       >
-        <Text style={{ fontSize: 26, fontWeight: '700', color: Colors.text }}>Profilim</Text>
+        
+        <WebHeader />
 
-        <View
-          style={{
-            marginTop: 12,
-            borderWidth: 1,
-            borderColor: Colors.border,
-            borderRadius: 14,
-            padding: 12,
-            backgroundColor: Colors.surface,
-            gap: 6,
-          }}
-        >
-          <Text style={{ color: Colors.text, fontWeight: '700' }}>
-            {user?.ad} {user?.soyad}
-          </Text>
-          <Text style={{ color: Colors.textSecondary }}>{userQuery.data?.email ?? user?.email ?? '-'}</Text>
-          <Text style={{ color: Colors.textSecondary }}>Rol: {user?.role}</Text>
+        {/* Profile Header (Circular Avatar and Name) */}
+        <View className="items-center pt-8 pb-8 rounded-b-[40px] mb-2 z-10">
+          <View className="relative mb-4">
+            <View className="w-[100px] h-[100px] rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100">
+              <Image 
+                source={{ uri: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80' }} 
+                className="w-full h-full object-cover"
+              />
+            </View>
+            <Pressable className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-yellow-600 border-2 border-white items-center justify-center shadow-md">
+              <Camera size={14} color="white" />
+            </Pressable>
+          </View>
+          <Text className="font-playfair text-2xl text-slate-900 font-bold tracking-tight">{user?.ad} {user?.soyad}</Text>
+          <Text className="text-slate-500 text-sm font-inter mt-1.5">DekoHome Üyesi</Text>
         </View>
 
-        <Text style={{ marginTop: 18, marginBottom: 8, color: Colors.text, fontWeight: '700' }}>Profil Duzenle</Text>
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: Colors.border,
-            borderRadius: 14,
-            padding: 12,
-            backgroundColor: Colors.surface,
-            gap: 10,
-          }}
-        >
-          <View>
-            <Text style={{ color: Colors.textSecondary, marginBottom: 6 }}>Ad</Text>
-            <TextInput
-              value={ad}
-              onChangeText={setAd}
-              placeholder="Ad"
-              placeholderTextColor={Colors.textMuted}
-              style={{
-                borderWidth: 1,
-                borderColor: Colors.border,
-                borderRadius: 12,
-                backgroundColor: Colors.surface,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                color: Colors.text,
-              }}
-            />
+        {/* Content Section (Responsive layout) */}
+        <View className="px-6 md:px-12 pb-20 max-w-6xl mx-auto w-full flex-col md:flex-row mt-4">
+
+          {/* Sidebar Menu */}
+          <View className="mb-8 md:mb-0 md:w-72 md:mr-8 flex-col gap-3">
+             <Pressable className="flex-row items-center p-4 rounded-2xl bg-yellow-600 shadow-sm shadow-yellow-600/20 active:opacity-90">
+                <User size={20} color="white" />
+                <Text className="ml-4 text-white font-inter-bold text-[15px]">Profil Bilgileri</Text>
+             </Pressable>
+
+             <Pressable onPress={handleNotImplemented} className="flex-row items-center p-4 rounded-2xl bg-white border border-slate-100 shadow-sm active:bg-slate-50">
+                <Package size={20} color="#64748b" />
+                <Text className="ml-4 text-slate-600 font-inter-bold text-[15px]">Siparişlerim</Text>
+             </Pressable>
+
+             <Pressable onPress={handleNotImplemented} className="flex-row items-center p-4 rounded-2xl bg-white border border-slate-100 shadow-sm active:bg-slate-50">
+                <Lock size={20} color="#64748b" />
+                <Text className="ml-4 text-slate-600 font-inter-bold text-[15px]">Şifre ve Güvenlik</Text>
+             </Pressable>
+
+             <View className="h-[1px] bg-slate-200 my-3" />
+
+             <Pressable 
+               onPress={handleDeleteProfile}
+               className="flex-row items-center p-4 rounded-2xl bg-red-50/50 border border-red-100 active:bg-red-50"
+             >
+                <Trash2 size={20} color="#ef4444" />
+                <Text className="ml-4 text-red-600 font-inter-bold text-[15px]">Hesabı Sil</Text>
+             </Pressable>
           </View>
 
-          <View>
-            <Text style={{ color: Colors.textSecondary, marginBottom: 6 }}>Soyad</Text>
-            <TextInput
-              value={soyad}
-              onChangeText={setSoyad}
-              placeholder="Soyad"
-              placeholderTextColor={Colors.textMuted}
-              style={{
-                borderWidth: 1,
-                borderColor: Colors.border,
-                borderRadius: 12,
-                backgroundColor: Colors.surface,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                color: Colors.text,
-              }}
-            />
+          {/* Main Form Area */}
+          <View className="flex-1 bg-white p-6 md:p-10 rounded-[24px] shadow-sm shadow-slate-100 border border-slate-100/50">
+            {/* Title */}
+            <View className="flex-row items-center gap-4 mb-10">
+               <View className="w-12 h-12 rounded-[14px] bg-yellow-50/80 items-center justify-center">
+                  <User size={22} color="#D48806" />
+               </View>
+               <Text className="font-playfair text-3xl text-slate-900 italic font-bold">Kişisel Bilgileri Güncelle</Text>
+            </View>
+
+            {/* Form */}
+            <View className="flex-row gap-5 mb-6 flex-wrap md:flex-nowrap">
+              <View className="flex-1 min-w-[45%]">
+                <Text className="text-[11px] font-inter-bold text-slate-400 border-slate-400 mb-2 tracking-[1.5px] uppercase">Ad</Text>
+                <View className="flex-row items-center border border-slate-200 rounded-[14px] px-4 h-14 bg-[#FAFAF9]">
+                  <User size={18} color="#94a3b8" />
+                  <TextInput
+                    className="flex-1 ml-3 text-sm text-slate-900 font-inter outline-none"
+                    value={ad}
+                    onChangeText={setAd}
+                  />
+                </View>
+              </View>
+
+              <View className="flex-1 min-w-[45%]">
+                <Text className="text-[11px] font-inter-bold text-slate-400 mb-2 tracking-[1.5px] uppercase">Soyad</Text>
+                <View className="flex-row items-center border border-slate-200 rounded-[14px] px-4 h-14 bg-[#FAFAF9]">
+                  <User size={18} color="#94a3b8" />
+                  <TextInput
+                    className="flex-1 ml-3 text-sm text-slate-900 font-inter outline-none"
+                    value={soyad}
+                    onChangeText={setSoyad}
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View className="mb-8">
+              <Text className="text-[11px] font-inter-bold text-slate-400 mb-2 tracking-[1.5px] uppercase">E-Posta Adresı</Text>
+              <View className="flex-row items-center border border-slate-200 rounded-[14px] px-4 h-14 bg-[#FAFAF9] opacity-70">
+                <Mail size={18} color="#94a3b8" />
+                <TextInput
+                  editable={false}
+                  className="flex-1 ml-3 text-sm text-slate-500 font-inter outline-none"
+                  value={user?.email || 'ornek@mail.com'} // Fallback for dev viewing
+                />
+              </View>
+              <View className="flex-row items-center mt-3 ml-1 gap-2">
+                  <Info size={14} color="#bac4d1" />
+                  <Text className="text-slate-400 text-[11px] font-inter">E-posta adresi sistem güvenliği sebebiyle değiştirilemez.</Text>
+              </View>
+            </View>
+
+            <View className="items-end">
+                <Pressable 
+                  onPress={handleSave}
+                  disabled={isSaving}
+                  className={`h-14 px-8 bg-[#0f172a] rounded-[16px] items-center justify-center mt-4 shadow-lg shadow-black/10 active:opacity-90 active:scale-95 transition-transform ${isSaving ? 'opacity-70' : ''}`}
+                >
+                   {isSaving ? (
+                     <ActivityIndicator color="#FFFFFF" size="small" />
+                   ) : (
+                     <Text className="text-white font-inter-bold text-[15px]">Değişiklikleri Kaydet</Text>
+                   )}
+                </Pressable>
+            </View>
           </View>
 
-          <Pressable
-            disabled={isSavingProfile}
-            onPress={onSaveProfile}
-            style={{
-              marginTop: 2,
-              height: 44,
-              borderRadius: 12,
-              backgroundColor: Colors.primary,
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: isSavingProfile ? 0.7 : 1,
-            }}
-          >
-            {isSavingProfile ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>Profili Kaydet</Text>
-            )}
-          </Pressable>
-        </View>
-
-        <Text style={{ marginTop: 18, marginBottom: 8, color: Colors.text, fontWeight: '700' }}>Kategori Tercihleri</Text>
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: Colors.border,
-            borderRadius: 14,
-            padding: 12,
-            backgroundColor: Colors.surface,
-          }}
-        >
-          {categoriesQuery.isLoading ? (
-            <View style={{ alignItems: 'center', paddingVertical: 8 }}>
-              <ActivityIndicator color={Colors.primary} />
-            </View>
-          ) : categories.length === 0 ? (
-            <EmptyState icon="list-outline" title="Kategori bulunamadi" description="Tercih secmek icin kategori listesi bekleniyor." />
-          ) : (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {categories.map((category) => {
-                const categoryId = category.id ?? category._id ?? '';
-                const selected = selectedCategoryIds.includes(categoryId);
-
-                return (
-                  <Pressable
-                    key={categoryId}
-                    disabled={isUpdatingPreference}
-                    onPress={() => onToggleCategory(categoryId)}
-                    style={{
-                      paddingHorizontal: 12,
-                      paddingVertical: 8,
-                      borderRadius: 999,
-                      borderWidth: 1,
-                      borderColor: selected ? Colors.primary : Colors.border,
-                      backgroundColor: selected ? '#FEF3C7' : Colors.surface,
-                      opacity: isUpdatingPreference ? 0.7 : 1,
-                    }}
-                  >
-                    <Text style={{ color: selected ? Colors.primaryDark : Colors.text }}>{category.name}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )}
-        </View>
-
-        <Pressable
-          onPress={() => router.push('/order/history')}
-          style={{
-            marginTop: 18,
-            backgroundColor: Colors.surface,
-            borderWidth: 1,
-            borderColor: Colors.border,
-            borderRadius: 12,
-            height: 44,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ color: Colors.text, fontWeight: '700' }}>Siparis Gecmisi</Text>
-        </Pressable>
-
-        <Pressable
-          onPress={handleLogout}
-          style={{
-            marginTop: 10,
-            backgroundColor: Colors.primary,
-            borderRadius: 12,
-            height: 44,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>Cikis Yap</Text>
-        </Pressable>
-
-        <View
-          style={{
-            marginTop: 18,
-            borderWidth: 1,
-            borderColor: '#FECACA',
-            borderRadius: 14,
-            padding: 12,
-            backgroundColor: '#FEF2F2',
-            gap: 8,
-          }}
-        >
-          <Text style={{ color: '#991B1B', fontWeight: '700' }}>Tehlikeli Islem</Text>
-          <Text style={{ color: '#B91C1C' }}>Hesabinizi silerseniz geri alinamaz.</Text>
-          <Pressable
-            onPress={() => setDeleteModalVisible(true)}
-            style={{
-              marginTop: 2,
-              height: 42,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: Colors.error,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#FEE2E2',
-            }}
-          >
-            <Text style={{ color: Colors.error, fontWeight: '700' }}>Hesabi Sil</Text>
-          </Pressable>
         </View>
       </ScrollView>
-
-      <Modal visible={deleteModalVisible} transparent animationType="fade" onRequestClose={() => setDeleteModalVisible(false)}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.45)',
-            justifyContent: 'center',
-            padding: 24,
-          }}
-        >
-          <View style={{ backgroundColor: Colors.surface, borderRadius: 14, padding: 16 }}>
-            <Text style={{ color: Colors.text, fontSize: 18, fontWeight: '700' }}>Hesabi silmek istiyor musunuz?</Text>
-            <Text style={{ marginTop: 8, color: Colors.textSecondary }}>
-              Bu islem geri alinmaz ve tum hesap verileriniz etkilenir.
-            </Text>
-
-            <View style={{ marginTop: 16, flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
-              <Pressable
-                disabled={deleteAccountMutation.isPending}
-                onPress={() => setDeleteModalVisible(false)}
-                style={{
-                  height: 40,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: Colors.border,
-                  paddingHorizontal: 14,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Text style={{ color: Colors.textSecondary, fontWeight: '700' }}>Vazgec</Text>
-              </Pressable>
-
-              <Pressable
-                disabled={deleteAccountMutation.isPending}
-                onPress={onDeleteAccount}
-                style={{
-                  height: 40,
-                  borderRadius: 10,
-                  backgroundColor: Colors.error,
-                  paddingHorizontal: 14,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: deleteAccountMutation.isPending ? 0.7 : 1,
-                }}
-              >
-                {deleteAccountMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>Evet, Sil</Text>
-                )}
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </>
+    </SafeAreaView>
   );
 }
+

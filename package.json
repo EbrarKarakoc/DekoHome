@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch web-backend/server.ts",
+    "dev": "tsx watch ortak-backend/server.ts",
     "build": "vite build web-frontend",
-    "start": "tsx web-backend/server.ts",
+    "start": "tsx ortak-backend/server.ts",
     "preview": "vite preview web-frontend",
     "clean": "rm -rf web-frontend/dist",
     "lint": "tsc --noEmit -p web-frontend/tsconfig.json",
-    "seed": "tsx web-backend/scripts/seed.ts"
+    "seed": "tsx ortak-backend/scripts/seed.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

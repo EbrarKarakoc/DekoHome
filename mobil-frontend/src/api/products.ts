@@ -15,7 +15,11 @@ function toSearchParams(filters: ProductFilters): string {
   const params = new URLSearchParams();
 
   if (filters.q) params.append('q', filters.q);
-  if (filters.categoryId) params.append('categoryId', filters.categoryId);
+  if (Array.isArray(filters.categoryId)) {
+    if (filters.categoryId.length > 0) params.append('categoryId', filters.categoryId.join(','));
+  } else if (filters.categoryId) {
+    params.append('categoryId', filters.categoryId);
+  }
   if (typeof filters.minPrice === 'number') params.append('minPrice', String(filters.minPrice));
   if (typeof filters.maxPrice === 'number') params.append('maxPrice', String(filters.maxPrice));
   if (typeof filters.page === 'number') params.append('page', String(filters.page));

@@ -4,7 +4,7 @@ import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 
 import { EmptyState } from '@components/common/EmptyState';
 import { ErrorMessage } from '@components/common/ErrorMessage';
-import { ProductCard } from '@components/product/ProductCard';
+import ProductCard from '@components/product/ProductCard';
 import { ProductSkeleton } from '@components/product/ProductSkeleton';
 import Colors from '@constants/colors';
 import { useCategories } from '@hooks/useCategories';

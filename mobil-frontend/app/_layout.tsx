@@ -1,3 +1,13 @@
+import '../global.css';
+import {
+  Inter_400Regular,
+  Inter_700Bold,
+  useFonts as useInterFonts,
+} from '@expo-google-fonts/inter';
+import {
+  PlayfairDisplay_700Bold,
+  useFonts as usePlayfairFonts,
+} from '@expo-google-fonts/playfair-display';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -23,13 +33,28 @@ export default function RootLayout() {
   const initialize = useAuthStore((state) => state.initialize);
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
+  const [interFontsLoaded] = useInterFonts({
+    Inter_400Regular,
+    Inter_700Bold,
+  });
+
+  const [playfairFontsLoaded] = usePlayfairFonts({
+    PlayfairDisplay_700Bold,
+  });
+
+  const fontsLoaded = interFontsLoaded && playfairFontsLoaded;
+
   useEffect(() => {
-    initialize().finally(() => {
+    if (isInitialized && fontsLoaded) {
       SplashScreen.hideAsync().catch(() => undefined);
-    });
+    }
+  }, [isInitialized, fontsLoaded]);
+
+  useEffect(() => {
+    initialize();
   }, [initialize]);
 
-  if (!isInitialized) {
+  if (!isInitialized || !fontsLoaded) {
     return null;
   }
 
