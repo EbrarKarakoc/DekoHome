@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { showMessage } from 'react-native-flash-message';
 
 import { authApi } from '@api/auth';
+import { usersApi } from '@api/users';
 import { useAuthStore } from '@store/authStore';
 import { useCartStore } from '@store/cartStore';
 import type { LoginRequest, RegisterRequest } from '@/types';
@@ -18,6 +19,18 @@ export function useAuth() {
       await hapticTap();
       const response = await authApi.login(payload);
       await login(response.token);
+
+      // Fetch full user profile to get email (not included in JWT)
+      const state = useAuthStore.getState();
+      if (state.user?.id) {
+        try {
+          const fullUser = await usersApi.getById(state.user.id);
+          useAuthStore.getState().setUser({ ...state.user, email: fullUser.email });
+        } catch {
+          // If profile fetch fails, still proceed with login
+        }
+      }
+
       await hapticSuccess();
       showMessage({ message: 'Hos geldiniz!', type: 'success' });
       router.replace('/(tabs)');

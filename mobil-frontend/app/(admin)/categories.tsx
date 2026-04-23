@@ -14,14 +14,43 @@ import {
 import { showMessage } from 'react-native-flash-message';
 
 import Colors from '@constants/colors';
-import { useCategories } from '@hooks/useCategories';
+import { useCategories, useUpdateCategory } from '@hooks/useCategories';
 import type { Category } from '@/types';
 import { getErrorMessage } from '@utils/error';
 
 export default function AdminCategoriesScreen() {
   const { data: categories = [], isLoading, isRefetching, refetch } = useCategories();
+  const { mutate: updateCategory, isPending: isUpdating } = useUpdateCategory();
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
+    setName(category.name);
+    setDescription(category.description || '');
+    setModalVisible(true);
+  };
+
+  const handleSave = () => {
+    if (!editingCategory) return;
+    const categoryId = editingCategory.id || editingCategory._id;
+    if (!categoryId) return;
+
+    updateCategory(
+      { id: categoryId, data: { name, description } },
+      {
+        onSuccess: () => {
+          showMessage({ message: 'Kategori başarıyla güncellendi', type: 'success' });
+          setModalVisible(false);
+        },
+        onError: (error) => {
+          showMessage({ message: getErrorMessage(error), type: 'danger' });
+        },
+      }
+    );
+  };
 
   const renderCategoryItem = (item: Category, level: number = 0) => (
     <View key={item.id ?? item._id}>
@@ -48,10 +77,7 @@ export default function AdminCategoriesScreen() {
         </Text>
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <Pressable
-            onPress={() => {
-              setEditingCategory(item);
-              setModalVisible(true);
-            }}
+            onPress={() => handleEdit(item)}
             style={{ padding: 4 }}
           >
             <Edit2 size={18} color={Colors.primary} />
@@ -108,13 +134,37 @@ export default function AdminCategoriesScreen() {
             <View style={{ marginBottom: 20 }}>
               <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.textSecondary, marginBottom: 8 }}>KATEGORİ ADI</Text>
               <TextInput
-                defaultValue={editingCategory?.name}
+                value={name}
+                onChangeText={setName}
+                placeholder="Örn: Oturma Odası"
                 style={{
                   borderWidth: 1,
                   borderColor: Colors.border,
                   borderRadius: 12,
                   padding: 14,
                   backgroundColor: Colors.surfaceAlt,
+                  color: Colors.text,
+                }}
+              />
+            </View>
+
+            <View style={{ marginBottom: 24 }}>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.textSecondary, marginBottom: 8 }}>AÇIKLAMA</Text>
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Kategori açıklamasını girin..."
+                multiline
+                numberOfLines={3}
+                style={{
+                  borderWidth: 1,
+                  borderColor: Colors.border,
+                  borderRadius: 12,
+                  padding: 14,
+                  backgroundColor: Colors.surfaceAlt,
+                  color: Colors.text,
+                  minHeight: 100,
+                  textAlignVertical: 'top',
                 }}
               />
             </View>
@@ -126,13 +176,23 @@ export default function AdminCategoriesScreen() {
                 <Text style={{ fontWeight: '700', color: Colors.textSecondary }}>İptal</Text>
               </Pressable>
               <Pressable
-                onPress={() => {
-                  showMessage({ message: 'Güncelleme fonksiyonu backend bağlantısı bekliyor', type: 'info' });
-                  setModalVisible(false);
+                onPress={handleSave}
+                disabled={isUpdating}
+                style={{
+                  flex: 1,
+                  height: 50,
+                  borderRadius: 12,
+                  backgroundColor: Colors.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: isUpdating ? 0.7 : 1,
                 }}
-                style={{ flex: 1, height: 50, borderRadius: 12, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' }}
               >
-                <Text style={{ fontWeight: '700', color: '#FFFFFF' }}>Kaydet</Text>
+                {isUpdating ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={{ fontWeight: '700', color: '#FFFFFF' }}>Kaydet</Text>
+                )}
               </Pressable>
             </View>
           </View>

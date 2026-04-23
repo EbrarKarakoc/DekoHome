@@ -15,4 +15,8 @@ export const categoriesApi = {
     const { data } = await apiClient.get<Category[]>('/categories');
     return data.map(normalizeCategory);
   },
+  async update(id: string, categoryData: Partial<Category>): Promise<Category> {
+    const { data } = await apiClient.put<Category>(`/categories/${id}`, categoryData);
+    return normalizeCategory(data);
+  },
 };

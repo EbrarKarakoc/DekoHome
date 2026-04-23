@@ -51,6 +51,7 @@ export interface Category {
   name: string;
   description?: string;
   icon?: string;
+  parentCategoryId?: string | null;
   children?: Category[];
 }
 
