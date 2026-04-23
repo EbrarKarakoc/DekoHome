@@ -32,6 +32,10 @@ export const reviewsApi = {
     return normalizeReview(data);
   },
 
+  async remove(productId: string, reviewId: string): Promise<void> {
+    await apiClient.delete(`/products/${productId}/reviews/${reviewId}`);
+  },
+
   async canUserReview(productId: string): Promise<boolean> {
     const { data } = await apiClient.get<ServerOrder[]>('/orders');
 

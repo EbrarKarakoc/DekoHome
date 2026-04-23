@@ -1,17 +1,19 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
 import type { Order } from '@/types';
 import { OrderStatusBadge } from '@components/order/OrderStatusBadge';
 import Colors from '@constants/colors';
-import { useCancelOrder, useOrder } from '@hooks/useOrders';
+import { useCancelOrder, useOrder, useUpdateOrder } from '@hooks/useOrders';
 import { useAuthStore } from '@store/authStore';
 import { getErrorMessage } from '@utils/error';
 import { formatCurrency } from '@utils/formatCurrency';
 import { formatDate } from '@utils/formatDate';
 
 const CANCELABLE_STATUSES: Order['status'][] = ['Onaylandı', 'Hazırlanıyor'];
+const EDITABLE_ADDRESS_STATUSES: Order['status'][] = ['Onaylandı', 'Hazırlanıyor'];
 
 export default function OrderDetailScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
@@ -20,6 +22,10 @@ export default function OrderDetailScreen() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const orderQuery = useOrder(orderId, isAuthenticated);
   const cancelOrderMutation = useCancelOrder();
+  const updateOrderMutation = useUpdateOrder();
+
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [editedAddress, setEditedAddress] = useState('');
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)/login" />;
@@ -46,11 +52,43 @@ export default function OrderDetailScreen() {
 
   const order = orderQuery.data;
   const canCancel = CANCELABLE_STATUSES.includes(order.status);
+  const canEditAddress = EDITABLE_ADDRESS_STATUSES.includes(order.status);
 
   const handleCancel = async () => {
     try {
       await cancelOrderMutation.mutateAsync(order.id ?? order._id ?? '');
       showMessage({ message: 'Siparis iptal edildi', type: 'success' });
+      await orderQuery.refetch();
+    } catch (error) {
+      showMessage({ message: getErrorMessage(error), type: 'danger' });
+    }
+  };
+
+  const handleStartEditAddress = () => {
+    setEditedAddress(order.address);
+    setIsEditingAddress(true);
+  };
+
+  const handleCancelEditAddress = () => {
+    setIsEditingAddress(false);
+    setEditedAddress('');
+  };
+
+  const handleSaveAddress = async () => {
+    const trimmedAddress = editedAddress.trim();
+    if (trimmedAddress.length < 10) {
+      showMessage({ message: 'Adres en az 10 karakter olmalidir', type: 'warning' });
+      return;
+    }
+
+    try {
+      await updateOrderMutation.mutateAsync({
+        orderId: order.id ?? order._id ?? '',
+        payload: { address: trimmedAddress },
+      });
+      showMessage({ message: 'Adres guncellendi', type: 'success' });
+      setIsEditingAddress(false);
+      setEditedAddress('');
       await orderQuery.refetch();
     } catch (error) {
       showMessage({ message: getErrorMessage(error), type: 'danger' });
@@ -83,7 +121,89 @@ export default function OrderDetailScreen() {
 
         <Text style={{ color: Colors.textSecondary }}>Tarih: {formatDate(order.createdAt)}</Text>
         <Text style={{ color: Colors.textSecondary }}>Odeme: {order.paymentMethod}</Text>
-        <Text style={{ color: Colors.textSecondary }}>Adres: {order.address}</Text>
+
+        {/* Adres Alanı – Düzenlenebilir */}
+        {isEditingAddress ? (
+          <View style={{ gap: 8 }}>
+            <Text style={{ color: Colors.text, fontWeight: '600', fontSize: 13 }}>Teslimat Adresi</Text>
+            <TextInput
+              multiline
+              numberOfLines={3}
+              value={editedAddress}
+              onChangeText={setEditedAddress}
+              placeholder="Yeni adresi girin"
+              placeholderTextColor={Colors.textMuted}
+              style={{
+                minHeight: 80,
+                borderWidth: 1,
+                borderColor: Colors.primary,
+                borderRadius: 10,
+                backgroundColor: '#FFFBEB',
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                color: Colors.text,
+                textAlignVertical: 'top',
+              }}
+            />
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <Pressable
+                disabled={updateOrderMutation.isPending}
+                onPress={handleSaveAddress}
+                style={{
+                  flex: 1,
+                  height: 38,
+                  borderRadius: 10,
+                  backgroundColor: Colors.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: updateOrderMutation.isPending ? 0.7 : 1,
+                }}
+              >
+                {updateOrderMutation.isPending ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>Kaydet</Text>
+                )}
+              </Pressable>
+              <Pressable
+                disabled={updateOrderMutation.isPending}
+                onPress={handleCancelEditAddress}
+                style={{
+                  flex: 1,
+                  height: 38,
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  borderColor: Colors.border,
+                  backgroundColor: Colors.surface,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={{ color: Colors.textSecondary, fontWeight: '600', fontSize: 14 }}>Vazgec</Text>
+              </Pressable>
+            </View>
+          </View>
+        ) : (
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
+            <Text style={{ color: Colors.textSecondary, flex: 1 }}>Adres: {order.address}</Text>
+            {canEditAddress ? (
+              <Pressable
+                onPress={handleStartEditAddress}
+                style={{
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  borderRadius: 8,
+                  backgroundColor: '#FEF3C7',
+                  borderWidth: 1,
+                  borderColor: Colors.primary,
+                }}
+              >
+                <Text style={{ color: Colors.primaryDark, fontWeight: '700', fontSize: 12 }}>Duzenle</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        )}
+
         {order.note ? <Text style={{ color: Colors.textSecondary }}>Not: {order.note}</Text> : null}
       </View>
 

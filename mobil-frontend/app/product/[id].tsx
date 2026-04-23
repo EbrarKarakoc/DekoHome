@@ -21,11 +21,11 @@ import { EmptyState } from '@components/common/EmptyState';
 import { ErrorMessage } from '@components/common/ErrorMessage';
 import { RatingStars } from '@components/product/RatingStars';
 import { ReviewItem } from '@components/product/ReviewItem';
-import type { ReviewPayload } from '@/types';
+import type { Review, ReviewPayload } from '@/types';
 import Colors from '@constants/colors';
 import { useAddToCart } from '@hooks/useCart';
 import { useProduct } from '@hooks/useProducts';
-import { useCanReview, useCreateReview, useReviews } from '@hooks/useReviews';
+import { useCanReview, useCreateReview, useDeleteReview, useReviews, useUpdateReview } from '@hooks/useReviews';
 import { useAuthStore } from '@store/authStore';
 import { getErrorMessage } from '@utils/error';
 import { formatCurrency } from '@utils/formatCurrency';
@@ -46,12 +46,19 @@ export default function ProductDetailScreen() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const currentUser = useAuthStore((state) => state.user);
 
   const productQuery = useProduct(productId);
   const reviewsQuery = useReviews(productId);
   const canReviewQuery = useCanReview(productId, isAuthenticated);
   const createReviewMutation = useCreateReview(productId);
+  const deleteReviewMutation = useDeleteReview(productId);
+  const updateReviewMutation = useUpdateReview(productId);
   const addToCartMutation = useAddToCart();
+
+  const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'rating-desc' | 'rating-asc'>('newest');
 
   const {
     control,
@@ -86,13 +93,49 @@ export default function ProductDetailScreen() {
 
     try {
       await hapticTap();
-      await createReviewMutation.mutateAsync(payload);
-      await hapticSuccess();
+      if (editingReviewId) {
+        await updateReviewMutation.mutateAsync({ reviewId: editingReviewId, payload });
+        await hapticSuccess();
+        showMessage({ message: 'Yorumunuz guncellendi', type: 'success' });
+        setEditingReviewId(null);
+      } else {
+        await createReviewMutation.mutateAsync(payload);
+        await hapticSuccess();
+        showMessage({ message: 'Yorumunuz eklendi', type: 'success' });
+      }
       reset({ rating: 5, comment: '' });
-      showMessage({ message: 'Yorumunuz kaydedildi', type: 'success' });
     } catch (error) {
       await hapticError();
       showMessage({ message: getErrorMessage(error), type: 'danger' });
+    }
+  };
+
+  const handleEditReview = (review: Review) => {
+    setEditingReviewId(review.id ?? review._id ?? null);
+    reset({
+      rating: review.rating,
+      comment: review.comment,
+    });
+    // Formun olduğu alanın en aşağıda olduğunu varsayarak basit bir UX seçimi. (İstenirse ScrollView eklenebilir)
+  };
+
+  const handleCancelEdit = () => {
+    setEditingReviewId(null);
+    reset({ rating: 5, comment: '' });
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    try {
+      setDeletingReviewId(reviewId);
+      await hapticTap();
+      await deleteReviewMutation.mutateAsync(reviewId);
+      await hapticSuccess();
+      showMessage({ message: 'Yorum silindi', type: 'success' });
+    } catch (error) {
+      await hapticError();
+      showMessage({ message: getErrorMessage(error), type: 'danger' });
+    } finally {
+      setDeletingReviewId(null);
     }
   };
 
@@ -236,9 +279,42 @@ export default function ProductDetailScreen() {
           {product.description || product.desc}
         </Text>
 
-        <Text style={{ marginTop: 22, marginBottom: 10, color: Colors.text, fontWeight: '700', fontSize: 18 }}>
-          Yorumlar
-        </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 22, marginBottom: 10 }}>
+          <Text style={{ color: Colors.text, fontWeight: '700', fontSize: 18 }}>
+            Yorumlar
+          </Text>
+          
+          {reviews.length > 0 ? (
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              {(['newest', 'rating-desc', 'rating-asc'] as const).map((order) => {
+                const isSelected = order === sortOrder;
+                const labels = {
+                  'newest': 'En Yeni',
+                  'rating-desc': 'Azalan Puan',
+                  'rating-asc': 'Artan Puan',
+                };
+                return (
+                  <Pressable
+                    key={order}
+                    onPress={() => setSortOrder(order)}
+                    style={{
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 8,
+                      backgroundColor: isSelected ? Colors.primary : Colors.surface,
+                      borderWidth: 1,
+                      borderColor: isSelected ? Colors.primary : Colors.border,
+                    }}
+                  >
+                    <Text style={{ color: isSelected ? '#FFFFFF' : Colors.textSecondary, fontSize: 11, fontWeight: '600' }}>
+                      {labels[order]}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : null}
+        </View>
 
         {reviews.length === 0 ? (
           <View style={{ marginBottom: 16 }}>
@@ -246,8 +322,26 @@ export default function ProductDetailScreen() {
           </View>
         ) : (
           <View style={{ gap: 10, marginBottom: 16 }}>
-            {reviews.map((review) => (
-              <ReviewItem key={review.id ?? review._id ?? `${review.userName}-${review.createdAt}`} review={review} />
+            {[...reviews]
+              .sort((a, b) => {
+                if (sortOrder === 'newest') {
+                  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                } else if (sortOrder === 'rating-desc') {
+                  return b.rating - a.rating;
+                } else if (sortOrder === 'rating-asc') {
+                  return a.rating - b.rating;
+                }
+                return 0;
+              })
+              .map((review) => (
+                <ReviewItem
+                  key={review.id ?? review._id ?? `${review.userName}-${review.createdAt}`}
+                  review={review}
+                  currentUserId={currentUser?.id}
+                  onEdit={handleEditReview}
+                  onDelete={handleDeleteReview}
+                  isDeleting={deletingReviewId === (review.id ?? review._id)}
+                />
             ))}
           </View>
         )}
@@ -263,9 +357,16 @@ export default function ProductDetailScreen() {
           </View>
         ) : null}
 
-        <Text style={{ marginTop: 6, marginBottom: 10, color: Colors.text, fontWeight: '700', fontSize: 18 }}>
-          Yorum Ekle
-        </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, marginBottom: 10 }}>
+          <Text style={{ color: Colors.text, fontWeight: '700', fontSize: 18 }}>
+            {editingReviewId ? 'Yorumu Duzenle' : 'Yorum Ekle'}
+          </Text>
+          {editingReviewId ? (
+            <Pressable onPress={handleCancelEdit}>
+              <Text style={{ color: Colors.primary, fontWeight: '600' }}>Iptal Et</Text>
+            </Pressable>
+          ) : null}
+        </View>
 
         {!isAuthenticated ? (
           <View
@@ -353,7 +454,7 @@ export default function ProductDetailScreen() {
             />
 
             <Pressable
-              disabled={isSubmitting || createReviewMutation.isPending}
+              disabled={isSubmitting || createReviewMutation.isPending || updateReviewMutation.isPending}
               onPress={handleSubmit(onSubmitReview)}
               style={{
                 marginTop: 14,
@@ -362,13 +463,15 @@ export default function ProductDetailScreen() {
                 height: 46,
                 alignItems: 'center',
                 justifyContent: 'center',
-                opacity: isSubmitting || createReviewMutation.isPending ? 0.7 : 1,
+                opacity: isSubmitting || createReviewMutation.isPending || updateReviewMutation.isPending ? 0.7 : 1,
               }}
             >
-              {isSubmitting || createReviewMutation.isPending ? (
+              {isSubmitting || createReviewMutation.isPending || updateReviewMutation.isPending ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>Yorumu Gonder</Text>
+                <Text style={{ color: '#FFFFFF', fontWeight: '700' }}>
+                  {editingReviewId ? 'Yorumu Guncelle' : 'Yorumu Gonder'}
+                </Text>
               )}
             </Pressable>
           </View>
