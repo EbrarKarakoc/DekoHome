@@ -41,3 +41,34 @@ export function useCreateReview(productId: string) {
     },
   });
 }
+
+export function useUpdateReview(productId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ reviewId, payload }: { reviewId: string; payload: Partial<ReviewPayload> }) =>
+      reviewsApi.update(productId, reviewId, payload),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: REVIEW_KEYS.list(productId) }),
+        queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.detail(productId) }),
+        queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.all }),
+      ]);
+    },
+  });
+}
+
+export function useDeleteReview(productId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (reviewId: string) => reviewsApi.remove(productId, reviewId),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: REVIEW_KEYS.list(productId) }),
+        queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.detail(productId) }),
+        queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.all }),
+      ]);
+    },
+  });
+}

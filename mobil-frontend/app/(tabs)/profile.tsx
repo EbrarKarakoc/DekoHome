@@ -167,7 +167,7 @@ export default function ProfileScreen() {
               <Text className="ml-4 text-white font-inter-bold text-[15px]">Profil Bilgileri</Text>
             </Pressable>
 
-            <Pressable onPress={handleNotImplemented} className="flex-row items-center p-4 rounded-2xl bg-white border border-slate-100 shadow-sm active:bg-slate-50">
+            <Pressable onPress={() => router.push('/order/history')} className="flex-row items-center p-4 rounded-2xl bg-white border border-slate-100 shadow-sm active:bg-slate-50">
               <Package size={20} color="#64748b" />
               <Text className="ml-4 text-slate-600 font-inter-bold text-[15px]">Siparişlerim</Text>
             </Pressable>
