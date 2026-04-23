@@ -44,4 +44,18 @@ export const productsApi = {
     const { data } = await apiClient.get<Product>(`/products/${id}`);
     return normalizeProduct(data);
   },
+
+  async create(productData: Partial<Product>): Promise<Product> {
+    const { data } = await apiClient.post<Product>('/products', productData);
+    return normalizeProduct(data);
+  },
+
+  async update(id: string, productData: Partial<Product>): Promise<Product> {
+    const { data } = await apiClient.put<Product>(`/products/${id}`, productData);
+    return normalizeProduct(data);
+  },
+
+  async delete(id: string): Promise<void> {
+    await apiClient.delete(`/products/${id}`);
+  },
 };

@@ -1,7 +1,7 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { productsApi } from '@api/products';
-import type { ProductFilters } from '@/types';
+import type { Product, ProductFilters } from '@/types';
 
 export const PRODUCTS_KEYS = {
   all: ['products'] as const,
@@ -35,5 +35,40 @@ export function useInfiniteProducts(filters: Omit<ProductFilters, 'page'> = {}) 
       return page < pages ? page + 1 : undefined;
     },
     initialPageParam: 1,
+  });
+}
+
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: Partial<Product>) => productsApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.all });
+    },
+  });
+}
+
+export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
+      productsApi.update(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.detail(id) });
+    },
+  });
+}
+
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => productsApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEYS.all });
+    },
   });
 }

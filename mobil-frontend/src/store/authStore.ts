@@ -51,6 +51,18 @@ export const useAuthStore = create<AuthState>((set) => {
           const user = mapTokenToUser(token);
           if (user) {
             set({ token, user, isAuthenticated: true });
+
+            // Fetch full user profile to get email (not in JWT)
+            try {
+              const { usersApi } = await import('@api/users');
+              const fullUser = await usersApi.getById(user.id);
+              set((state) => ({
+                user: state.user ? { ...state.user, email: fullUser.email } : state.user,
+              }));
+            } catch {
+              // Silently fail - email will remain empty
+            }
+
             return;
           }
         }
