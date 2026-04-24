@@ -10,7 +10,6 @@ pipeline {
         stage('Cleanup') {
             steps {
                 echo 'Eski konteynerler temizleniyor...'
-                // Eğer daha önce çalışan bir konteyner varsa durdur ve sil
                 sh "docker stop ${IMAGE_NAME} || true"
                 sh "docker rm ${IMAGE_NAME} || true"
             }
@@ -26,8 +25,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Uygulama yayına alınıyor...'
-                // Şimdilik .env dosyasız çalıştırıyoruz, veritabanı bağlantısı Jenkins ayarlarından yapılacak
-                sh "docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${IMAGE_NAME}"
+                // Jenkins kasasından şifreyi çekip Docker'a veriyoruz
+                withCredentials([string(credentialsId: 'MONGO_URI', variable: 'DB_URI')]) {
+                    sh "docker run -d --name ${IMAGE_NAME} -p 3000:3000 -e MONGODB_URI=${DB_URI} ${IMAGE_NAME}"
+                }
             }
         }
     }
