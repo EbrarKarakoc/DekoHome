@@ -2,33 +2,32 @@ pipeline {
     agent any
 
     environment {
-        // İmaj adını burada değişken olarak tanımlıyoruz
         IMAGE_NAME = "dekohome-app"
     }
 
     stages {
-        stage('Cleanup') {
+        stage('Checkout') {
             steps {
-                echo 'Eski konteynerler temizleniyor...'
-                sh "docker stop ${IMAGE_NAME} || true"
-                sh "docker rm ${IMAGE_NAME} || true"
+                echo 'Kod çekiliyor...'
+                git branch: 'main', url: 'https://github.com/EbrarKarakoc/DekoHome.git'
             }
         }
 
-        stage('Docker Build') {
+        stage('Build & Deploy') {
             steps {
-                echo 'Docker imajı oluşturuluyor...'
-                sh "docker build -t ${IMAGE_NAME} ."
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Uygulama yayına alınıyor...'
-                // Jenkins kasasından şifreyi çekip Docker'a veriyoruz
+                echo 'Docker Compose ile build ve deploy yapılıyor...'
+                sh 'docker compose down || true'
                 withCredentials([string(credentialsId: 'MONGO_URI', variable: 'DB_URI')]) {
-                    sh "docker run -d --name ${IMAGE_NAME} -p 3000:3000 -e MONGODB_URI=${DB_URI} ${IMAGE_NAME}"
+                    sh "MONGODB_URI=${DB_URI} docker compose up -d --build"
                 }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                echo 'Sağlık kontrolü yapılıyor...'
+                sleep 10
+                sh 'curl -f http://localhost:3000/v1/health || exit 1'
             }
         }
     }

@@ -1,22 +1,35 @@
-# 1. Aşama: Node.js ortamı
-FROM node:20-slim
+# Stage 1: Build stage
+FROM node:20-slim AS builder
 
-# 2. Aşama: Çalışma dizini
 WORKDIR /app
 
-# 3. Aşama: Bağımlılık yönetimi
+# Bağımlılıkları kopyala ve yükle
 COPY package*.json ./
 RUN npm install
 
-# 4. Aşama: Kodları kopyala
+# Tüm kodu kopyala ve frontend build'ini yap
 COPY . .
-
-# 5. Aşama: Frontend Build (Vite)
 RUN npm run build
 
-# 6. Aşama: Port ve Ortam Değişkenleri
+# Stage 2: Runtime stage
+FROM node:20-slim
+
+WORKDIR /app
+
+# Sadece gerekli dosyaları kopyala
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/ortak-backend ./ortak-backend
+COPY --from=builder /app/web-frontend/dist ./web-frontend/dist
+
+# Healthcheck için curl yükle
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 EXPOSE 3000
 ENV NODE_ENV=production
 
-# 7. Aşama: Başlatma
+# Sağlık kontrolü (Jenkins pipeline için kritik)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/v1/health || exit 1
+
 CMD ["npm", "start"]

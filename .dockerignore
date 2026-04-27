@@ -1,7 +1,13 @@
 node_modules
 npm-debug.log
 web-frontend/dist
+mobil-frontend/
 .git
 .env
+.env*
 .DS_Store
 *.md
+*.jpeg
+Jenkinsfile
+Dockerfile
+docker-compose.yml
