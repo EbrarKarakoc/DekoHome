@@ -21,7 +21,6 @@
 **DekoHome by Meyran**, modern mobilya ve ev dekorasyonu dünyasını dijital ortama taşıyan, hem web hem de mobil platformlarda çalışan kapsamlı bir e-ticaret uygulamasıdır. İsveç kökenli dünyaca ünlü IKEA'nın kullanıcı dostu alışveriş deneyiminden ilham alınarak geliştirilen bu proje, Türk kullanıcılarına yerel bir alternatif sunmayı amaçlamaktadır.
 
 DekoHome ile kullanıcılar; binlerce mobilya ve dekorasyon ürününe göz atabilir, kategorilere göre filtreleme yapabilir, ürünleri sanal sepetlerine ekleyerek kolayca sipariş verebilir ve satın aldıkları ürünler için yorum bırakabilir. Güvenli ödeme altyapısı, hızlı sipariş takip sistemi ve sezgisel arayüz tasarımıyla DekoHome, online ev alışverişini keyifli ve zahmetsiz bir deneyime dönüştürmektedir.
-
 ---
 
 ## Özellikler
