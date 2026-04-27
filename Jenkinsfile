@@ -16,11 +16,14 @@ pipeline {
         stage('Build & Deploy') {
             steps {
                 echo 'Docker Compose ile build ve deploy yapılıyor...'
-                sh 'docker compose down || true'
+                sh '''
+                    docker compose down --remove-orphans || true
+                    docker rm -f dekohome-app || true
+                '''
                 withCredentials([string(credentialsId: 'MONGO_URI', variable: 'DB_URI')]) {
                     sh '''
                         printf 'MONGODB_URI=%s\n' "$DB_URI" > .env
-                        docker compose up -d --build
+                        docker compose up -d --build --force-recreate
                     '''
                 }
             }
