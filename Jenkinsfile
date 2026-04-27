@@ -18,7 +18,10 @@ pipeline {
                 echo 'Docker Compose ile build ve deploy yapılıyor...'
                 sh 'docker compose down || true'
                 withCredentials([string(credentialsId: 'MONGO_URI', variable: 'DB_URI')]) {
-                    sh "MONGODB_URI=${DB_URI} docker compose up -d --build"
+                    sh '''
+                        printf 'MONGODB_URI=%s\n' "$DB_URI" > .env
+                        docker compose up -d --build
+                    '''
                 }
             }
         }
