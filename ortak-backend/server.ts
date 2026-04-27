@@ -89,6 +89,9 @@ async function startServer() {
         server: { middlewareMode: true },
         appType: "spa",
         root: path.join(process.cwd(), "web-frontend"),
+        optimizeDeps: {
+          exclude: ['ioredis', 'amqplib']
+        }
       });
       app.use(vite.middlewares);
       console.log("✅ Vite dev server started.");
@@ -104,6 +107,19 @@ async function startServer() {
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
+  }
+
+  // Redis & RabbitMQ sadece production modunda başlatılır.
+  // Dev modda Vite worker thread'leri ioredis socket objelerini
+  // serialize edemez ve DataCloneError fırlatır veya asılı kalır.
+  if (process.env.NODE_ENV === 'production') {
+    import('./services/cache.js').then(({ initRedis }) => {
+      setImmediate(() => initRedis());
+    }).catch(console.error);
+
+    import('./services/queue.js').then(({ initRabbitMQ }) => {
+      setImmediate(() => { initRabbitMQ().catch(console.error); });
+    }).catch(console.error);
   }
 
   app.listen(PORT, "0.0.0.0", () => {

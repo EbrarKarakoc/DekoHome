@@ -5,8 +5,10 @@ import Category from '../models/Category.js';
 import Review from '../models/Review.js';
 import Order from '../models/Order.js';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth.js';
+import { getCache, setCache, deleteByPattern } from '../services/cache.js';
 
 const router = express.Router();
+const PRODUCTS_CACHE_KEY = 'products:all';
 
 const mockCategories = [
   { name: 'Oturma Odası', description: 'Koltuk, kanepe, sehpa vb.', icon: 'Sofa' },
@@ -152,6 +154,8 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
     });
 
     await product.save();
+    // Cache invalidation — yeni ürün eklendi, listeyi temizle
+    await deleteByPattern('products:*');
     
     res.status(201).json({
       id: product._id.toString(),
@@ -191,6 +195,18 @@ router.get('/', async (req, res) => {
         })),
         pagination: { total: mockProductsData.length, page: 1, pages: 1, limit: 100 }
       });
+    }
+
+    // ── Redis Cache Kontrolü ──
+    // Sadece filtresiz istek (tüm ürünler) cache'lenir
+    const hasFilters = req.query.q || req.query.categoryId || req.query.minPrice || req.query.maxPrice;
+    if (!hasFilters) {
+      const cached = await getCache(PRODUCTS_CACHE_KEY);
+      if (cached) {
+        console.log('⚡ Redis Cache HIT → products:all');
+        return res.json(JSON.parse(cached));
+      }
+      console.log('🔍 Redis Cache MISS → products:all (DB\'den çekilecek)');
     }
 
     const { q, categoryId, minPrice, maxPrice, page = '1', limit = '10' } = req.query;
@@ -253,7 +269,7 @@ router.get('/', async (req, res) => {
       .skip(skip)
       .limit(limitNumber);
     
-    res.json({
+    const responseBody = {
       products: products.map((product: any) => ({
         id: product._id.toString(),
         name: product.name,
@@ -272,7 +288,14 @@ router.get('/', async (req, res) => {
         pages: limitNumber > 0 ? Math.ceil(total / limitNumber) : 1,
         limit: limitNumber
       }
-    });
+    };
+
+    // Filtresiz istekte sonucu Redis'e yaz (60 saniye TTL)
+    if (!hasFilters) {
+      await setCache(PRODUCTS_CACHE_KEY, JSON.stringify(responseBody), 60);
+    }
+
+    res.json(responseBody);
   } catch (error: any) {
     console.error('❌ GET /products error:', error);
     res.status(500).json({ message: 'Sunucu hatası', error: error.message });
@@ -329,6 +352,8 @@ router.put('/:productId', authenticate, requireAdmin, async (req: AuthRequest, r
       { $set: updateData },
       { new: true }
     );
+    // Cache invalidation — ürün güncellendi
+    await deleteByPattern('products:*');
 
     if (!product) {
       return res.status(404).json({ message: 'Ürün bulunamadı' });
@@ -371,6 +396,9 @@ router.delete('/:productId', authenticate, requireAdmin, async (req: AuthRequest
     if (!product) {
       return res.status(404).json({ message: 'Ürün bulunamadı' });
     }
+
+    // Cache invalidation — ürün silindi
+    await deleteByPattern('products:*');
 
     res.status(204).send();
   } catch (error) {

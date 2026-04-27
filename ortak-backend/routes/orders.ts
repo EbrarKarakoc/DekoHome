@@ -3,6 +3,7 @@ import Order from '../models/Order.js';
 import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth.js';
+import { publishToQueue } from '../services/queue.js';
 
 const router = express.Router();
 
@@ -62,6 +63,16 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
     cart.items.splice(0, cart.items.length);
     cart.total = 0;
     await cart.save();
+
+    // ── RabbitMQ: Sipariş bildirimi kuyruğa gönder ──
+    // Başarısız olursa sipariş yine kabul edilir (fire-and-forget)
+    await publishToQueue('order_notifications', {
+      orderId: order._id.toString(),
+      userId: order.userId.toString(),
+      total: order.total,
+      itemCount: order.items.length,
+      createdAt: order.createdAt.toISOString(),
+    });
 
     res.status(201).json(order);
   } catch (error) {
