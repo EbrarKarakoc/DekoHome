@@ -32,8 +32,8 @@ pipeline {
         stage('Health Check') {
             steps {
                 echo 'Sağlık kontrolü yapılıyor...'
-                sleep 10
-                sh 'curl -f http://localhost:3000/v1/health || exit 1'
+                sleep 15
+                sh 'curl -f http://host.docker.internal:3000/v1/health || exit 1'
             }
         }
     }
