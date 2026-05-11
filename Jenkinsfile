@@ -22,7 +22,15 @@ pipeline {
                 '''
                 withCredentials([string(credentialsId: 'MONGO_URI', variable: 'DB_URI')]) {
                     sh '''
-                        printf 'MONGODB_URI=%s\n' "$DB_URI" > .env
+                        cat > .env << EOF
+MONGODB_URI=$DB_URI
+JWT_SECRET=super_secret_jwt_key_for_dekohome_project
+PORT=3000
+NODE_ENV=production
+REDIS_URL=redis://redis:6379
+RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+SKIP_VITE=true
+EOF
                         docker compose up -d --build --force-recreate
                     '''
                 }
