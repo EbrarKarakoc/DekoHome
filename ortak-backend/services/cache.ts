@@ -14,7 +14,7 @@ let isRedisReady = false;
  * Server başlarken bir kez çağrılmalıdır.
  */
 export async function initRedis(): Promise<void> {
-  if (process.env.NODE_ENV !== 'production') return; // Sadece production'da başlat
+  // Geliştirme modunda da çalışabilmesi için production kısıtlaması kaldırıldı
 
   try {
     const { Redis } = await import('ioredis');

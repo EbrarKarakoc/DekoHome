@@ -46,9 +46,9 @@ router.get('/seed', async (req, res) => {
   try {
     const state = mongoose.connection.readyState;
     if (state === 2) {
-      return res.status(503).json({ 
-        success: false, 
-        message: 'MongoDB bağlantısı şu anda kurulmaya çalışılıyor (Hala bağlanıyor). Eğer bu durum uzun sürüyorsa, MongoDB Atlas\'ta "Network Access" kısmından IP adresinize (0.0.0.0/0) izin verdiğinizden emin olun.' 
+      return res.status(503).json({
+        success: false,
+        message: 'MongoDB bağlantısı şu anda kurulmaya çalışılıyor (Hala bağlanıyor). Eğer bu durum uzun sürüyorsa, MongoDB Atlas\'ta "Network Access" kısmından IP adresinize (0.0.0.0/0) izin verdiğinizden emin olun.'
       });
     }
     if (state !== 1) {
@@ -58,33 +58,33 @@ router.get('/seed', async (req, res) => {
     // Clear existing data
     await Product.deleteMany({});
     await Category.deleteMany({});
-    
+
     // Insert top-level categories first
     const topLevelCats = mockCategories.filter(c => !c.parentCategoryName);
     const subCats = mockCategories.filter(c => c.parentCategoryName);
-    
+
     const insertedTopLevel = await Category.insertMany(topLevelCats);
-    
+
     // Build map for parent IDs
     const categoryMap = insertedTopLevel.reduce((acc, cat) => {
       acc[cat.name] = cat._id;
       return acc;
     }, {} as Record<string, mongoose.Types.ObjectId>);
-    
+
     // Prepare subcategories with parentCategoryId
     const subToInsert = subCats.map(sc => ({
       name: sc.name,
       description: sc.description,
       parentCategoryId: categoryMap[sc.parentCategoryName as string]
     }));
-    
+
     const insertedSubLevel = await Category.insertMany(subToInsert);
-    
+
     // Final category map including subcategories
     insertedSubLevel.forEach(cat => {
       categoryMap[cat.name] = cat._id;
     });
-    
+
     // Prepare products with categoryId
     const productsToInsert = mockProductsData.map(p => {
       const { categoryName, ...rest } = p;
@@ -96,11 +96,11 @@ router.get('/seed', async (req, res) => {
 
     // Insert products
     const insertedProducts = await Product.insertMany(productsToInsert);
-    
-    res.json({ 
+
+    res.json({
       message: 'Veritabanı başarıyla güncellendi!',
       categoriesCount: insertedTopLevel.length + insertedSubLevel.length,
-      productsCount: insertedProducts.length 
+      productsCount: insertedProducts.length
     });
   } catch (error) {
     console.error('Error seeding database:', error);
@@ -156,7 +156,7 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
     await product.save();
     // Cache invalidation — yeni ürün eklendi, listeyi temizle
     await deleteByPattern('products:*');
-    
+
     res.status(201).json({
       id: product._id.toString(),
       name: product.name,
@@ -187,10 +187,10 @@ router.get('/', async (req, res) => {
           desc: p.description,
           category: p.categoryName,
           // Mock categoryId based on name for offline filtering
-          categoryId: p.categoryName === 'Koltuklar' ? '101' : 
-                     p.categoryName === 'Sehpalar' ? '102' :
-                     p.categoryName === 'Yataklar' ? '201' :
-                     p.categoryName === 'Gardıroplar' ? '202' : '1', 
+          categoryId: p.categoryName === 'Koltuklar' ? '101' :
+            p.categoryName === 'Sehpalar' ? '102' :
+              p.categoryName === 'Yataklar' ? '201' :
+                p.categoryName === 'Gardıroplar' ? '202' : '1',
           stock: 10
         })),
         pagination: { total: mockProductsData.length, page: 1, pages: 1, limit: 100 }
@@ -210,24 +210,24 @@ router.get('/', async (req, res) => {
     }
 
     const { q, categoryId, minPrice, maxPrice, page = '1', limit = '10' } = req.query;
-    
+
     let query: any = {};
-    
+
     if (q) {
       query.$or = [
         { name: { $regex: q as string, $options: 'i' } },
         { description: { $regex: q as string, $options: 'i' } }
       ];
     }
-    
+
     if (categoryId) {
-      const categoryIds = Array.isArray(categoryId) 
-        ? categoryId 
+      const categoryIds = Array.isArray(categoryId)
+        ? categoryId
         : (typeof categoryId === 'string' && categoryId.includes(',') ? categoryId.split(',') : [categoryId]);
 
       const validObjectIds: string[] = [];
       const namesToSearch: string[] = [];
-      
+
       categoryIds.forEach((cat: any) => {
         const catStr = String(cat).trim();
         if (mongoose.Types.ObjectId.isValid(catStr)) {
@@ -251,7 +251,7 @@ router.get('/', async (req, res) => {
         }
       }
     }
-    
+
     if (minPrice || maxPrice) {
       query.price = {};
       if (minPrice) query.price.$gte = Number(minPrice);
@@ -268,7 +268,7 @@ router.get('/', async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNumber);
-    
+
     const responseBody = {
       products: products.map((product: any) => ({
         id: product._id.toString(),
@@ -392,7 +392,7 @@ router.delete('/:productId', authenticate, requireAdmin, async (req: AuthRequest
     }
 
     const product = await Product.findByIdAndDelete(productId);
-    
+
     if (!product) {
       return res.status(404).json({ message: 'Ürün bulunamadı' });
     }
@@ -415,7 +415,7 @@ router.get('/:productId/reviews', async (req, res) => {
     }
 
     const reviews = await Review.find({ productId: req.params.productId }).populate('userId', 'ad soyad');
-    
+
     res.json(reviews.map((review: any) => ({
       id: review._id,
       productId: review.productId,

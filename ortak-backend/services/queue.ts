@@ -18,11 +18,11 @@ let isRabbitReady = false;
  * Server başlarken bir kez çağrılmalıdır.
  */
 export async function initRabbitMQ(retries = 5): Promise<void> {
-  if (process.env.NODE_ENV !== 'production') return; // Sadece production'da başlat
+  // Geliştirme modunda da çalışabilmesi için production kısıtlaması kaldırıldı
 
   try {
     const amqplib = (await import('amqplib')).default;
-    
+
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const conn = await amqplib.connect(RABBITMQ_URL);

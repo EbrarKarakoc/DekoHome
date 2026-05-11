@@ -22,8 +22,9 @@ pipeline {
                 '''
                 withCredentials([string(credentialsId: 'MONGO_URI', variable: 'DB_URI')]) {
                     sh '''
+                        CLEAN_URI=$(echo "$DB_URI" | sed 's/^MONGODB_URI=//; s/^"//; s/"$//')
                         cat > .env << EOF
-MONGODB_URI=$DB_URI
+MONGODB_URI=$CLEAN_URI
 JWT_SECRET=super_secret_jwt_key_for_dekohome_project
 PORT=3000
 NODE_ENV=production

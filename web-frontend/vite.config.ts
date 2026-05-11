@@ -22,6 +22,13 @@ export default defineConfig(({mode}) => {
         port: 24680,
       },
       port: 24679,
+      proxy: {
+        '/v1': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
   };
 });
