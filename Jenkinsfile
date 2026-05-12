@@ -18,7 +18,7 @@ pipeline {
                 echo 'Docker Compose ile build ve deploy yapılıyor...'
                 sh '''
                     docker compose down --remove-orphans || true
-                    docker rm -f dekohome-app || true
+                    docker rm -f dekohome-app dekohome-rabbitmq dekohome-redis dekohome-worker || true
                 '''
                 withCredentials([string(credentialsId: 'MONGO_URI', variable: 'DB_URI')]) {
                     sh '''
