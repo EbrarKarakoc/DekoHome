@@ -1,24 +1,17 @@
-// ioredis importu dinamik olarak yapılacak
 
-// ── Redis Client ────────────────────────────────────────────────
-// Bağlantı URL'si .env'den okunur; yoksa localhost:6379 varsayılan.
-// Bağlantı kurulamazsa uygulama çökmez, sadece cache devre dışı kalır.
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
 let redisClient: any | null = null; // using any to avoid type check errors without top-level import
 let isRedisReady = false;
 
-/**
- * Redis bağlantısını başlatır.
- * Server başlarken bir kez çağrılmalıdır.
- */
+
 export async function initRedis(): Promise<void> {
-  // Geliştirme modunda da çalışabilmesi için production kısıtlaması kaldırıldı
+
 
   try {
     const { Redis } = await import('ioredis');
-    
+
     redisClient = new Redis(REDIS_URL, {
       maxRetriesPerRequest: 3,
       retryStrategy(times: number): number | null {
@@ -49,10 +42,7 @@ export async function initRedis(): Promise<void> {
   }
 }
 
-/**
- * Cache'ten veri oku.
- * Redis bağlı değilse null döner — çağıran kod DB'ye gider.
- */
+
 export async function getCache(key: string): Promise<string | null> {
   if (!redisClient || !isRedisReady) return null;
   try {
@@ -77,9 +67,7 @@ export async function setCache(key: string, value: string, ttl = 60): Promise<vo
   }
 }
 
-/**
- * Belirli bir anahtarı sil (cache invalidation).
- */
+
 export async function deleteCache(key: string): Promise<void> {
   if (!redisClient || !isRedisReady) return;
   try {
@@ -89,10 +77,7 @@ export async function deleteCache(key: string): Promise<void> {
   }
 }
 
-/**
- * Belirli bir prefix ile başlayan tüm anahtarları sil.
- * Ör. deleteByPattern("products:*") → tüm ürün cache'lerini temizler.
- */
+
 export async function deleteByPattern(pattern: string): Promise<void> {
   if (!redisClient || !isRedisReady) return;
   try {
