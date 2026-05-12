@@ -1,6 +1,7 @@
 import express from 'express';
 import Review from '../models/Review.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { publishToQueue } from '../services/queue.js';
 
 const router = express.Router();
 
@@ -57,6 +58,16 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
 
     const populatedReview = await Review.findById(review._id)
       .populate('userId', 'name');
+
+    // ── RabbitMQ: Yorum ekleme bildirimi kuyruğa gönder ──
+    await publishToQueue('review_notifications', {
+      reviewId: review._id.toString(),
+      productId,
+      userId: req.user!.userId,
+      rating,
+      comment,
+      createdAt: new Date().toISOString(),
+    });
 
     res.status(201).json(populatedReview);
   } catch (error) {

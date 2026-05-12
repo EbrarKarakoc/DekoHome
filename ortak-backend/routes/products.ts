@@ -6,6 +6,7 @@ import Review from '../models/Review.js';
 import Order from '../models/Order.js';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth.js';
 import { getCache, setCache, deleteByPattern } from '../services/cache.js';
+import { publishToQueue } from '../services/queue.js';
 
 const router = express.Router();
 const PRODUCTS_CACHE_KEY = 'products:all';
@@ -463,6 +464,16 @@ router.post('/:productId/reviews', authenticate, async (req: AuthRequest, res) =
     });
 
     await review.save();
+
+    // ── RabbitMQ: Yorum ekleme bildirimi kuyruğa gönder ──
+    await publishToQueue('review_notifications', {
+      reviewId: review._id.toString(),
+      productId: req.params.productId,
+      userId: req.user?.userId,
+      rating,
+      comment,
+      createdAt: new Date().toISOString(),
+    });
 
     res.status(201).json({
       id: review._id,

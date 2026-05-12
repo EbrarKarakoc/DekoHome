@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { publishToQueue } from '../services/queue.js';
 
 const router = express.Router();
 
@@ -84,6 +85,17 @@ router.post('/items', authenticate, async (req: AuthRequest, res) => {
     await cart.save();
 
     const populatedCart = await Cart.findById(cart._id).populate('items.productId', 'name imageUrl');
+
+    // ── RabbitMQ: Sepete ürün ekleme bildirimi kuyruğa gönder ──
+    await publishToQueue('cart_notifications', {
+      userId: req.user?.userId,
+      productId,
+      productName: product.name,
+      quantity,
+      price: product.price,
+      cartTotal: cart.total,
+      createdAt: new Date().toISOString(),
+    });
 
     res.status(201).json({
       items: (populatedCart as any).items.map((item: any) => ({
