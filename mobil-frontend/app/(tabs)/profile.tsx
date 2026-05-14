@@ -138,7 +138,7 @@ export default function ProfileScreen() {
         style={Platform.OS === 'web' ? ({ flex: 1, overflowY: 'auto' } as any) : undefined}
       >
 
-        <WebHeader />
+        {Platform.OS === 'web' && <WebHeader />}
 
         {/* Profile Header (Circular Avatar and Name) */}
         <View className="items-center pt-8 pb-8 rounded-b-[40px] mb-2 z-10">
@@ -157,11 +157,11 @@ export default function ProfileScreen() {
           <Text className="text-slate-500 text-sm font-inter mt-1.5">DekoHome Üyesi</Text>
         </View>
 
-        {/* Content Section (Responsive layout) */}
-        <View className="px-6 md:px-12 pb-20 max-w-6xl mx-auto w-full flex-col md:flex-row mt-4">
+        {/* Content Section (Mobile First Layout) */}
+        <View className="px-5 pb-20 w-full flex-col mt-4">
 
-          {/* Sidebar Menu */}
-          <View className="mb-8 md:mb-0 md:w-72 md:mr-8 flex-col gap-3">
+          {/* Sidebar Menu (Now Top/List Menu on Mobile) */}
+          <View className="mb-6 w-full flex-col gap-3">
             <Pressable className="flex-row items-center p-4 rounded-2xl bg-yellow-600 shadow-sm shadow-yellow-600/20 active:opacity-90">
               <User size={20} color="white" />
               <Text className="ml-4 text-white font-inter-bold text-[15px]">Profil Bilgileri</Text>
@@ -210,7 +210,7 @@ export default function ProfileScreen() {
           </View>
 
           {/* Main Form Area */}
-          <View className="flex-1 bg-white p-6 md:p-10 rounded-[24px] shadow-sm shadow-slate-100 border border-slate-100/50">
+          <View className="flex-1 bg-white p-5 rounded-[24px] shadow-sm shadow-slate-100 border border-slate-100/50">
             {/* Title */}
             <View className="flex-row items-center gap-4 mb-10">
               <View className="w-12 h-12 rounded-[14px] bg-yellow-50/80 items-center justify-center">
@@ -220,7 +220,7 @@ export default function ProfileScreen() {
             </View>
 
             {/* Form */}
-            <View className="flex-row gap-5 mb-6 flex-wrap md:flex-nowrap">
+            <View className="gap-4 mb-6">
               <View className="flex-1 min-w-[45%]">
                 <Text className="text-[11px] font-inter-bold text-slate-400 border-slate-400 mb-2 tracking-[1.5px] uppercase">Ad</Text>
                 <View className="flex-row items-center border border-slate-200 rounded-[14px] px-4 h-14 bg-[#FAFAF9]">

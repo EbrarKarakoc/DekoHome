@@ -12,8 +12,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["node"],
-    "allowImportingTsExtensions": true
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "**/*.ts",

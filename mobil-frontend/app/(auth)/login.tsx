@@ -206,6 +206,14 @@ export default function LoginScreen() {
               )}
             </Pressable>
 
+            {/* Footer Link (Moved Up) */}
+            <View className="flex-row justify-center mt-2 mb-10">
+              <Text className="text-slate-500 font-inter">Hesabınız yok mu? </Text>
+              <Pressable onPress={() => router.push('/(auth)/register')}>
+                <Text className="text-slate-900 font-inter-bold">Hemen Kayıt Ol</Text>
+              </Pressable>
+            </View>
+
             {/* Social Logins */}
             <View className="flex-row gap-4">
               <Pressable className="flex-1 h-14 rounded-2xl border border-slate-200 flex-row items-center justify-center bg-white shadow-sm">
@@ -218,13 +226,15 @@ export default function LoginScreen() {
               </Pressable>
             </View>
 
-            {/* Footer Link */}
-            <View className="flex-row justify-center mt-6">
-              <Text className="text-slate-500 font-inter">Hesabınız yok mu? </Text>
-              <Link href="/(auth)/register">
-                <Text className="text-primary-600 font-inter-bold">Kayıt Ol</Text>
-              </Link>
-            </View>
+            {/* Admin Shortcut Button */}
+            <Pressable
+              onPress={() => router.push('/(auth)/admin-login')}
+              className="h-14 rounded-full border-2 border-slate-900 flex-row items-center justify-center mt-6 mb-6"
+            >
+              <Text className="text-slate-900 text-base font-inter-bold">Yönetici Girişi</Text>
+            </Pressable>
+
+
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

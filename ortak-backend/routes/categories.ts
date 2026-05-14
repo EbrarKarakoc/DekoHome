@@ -57,6 +57,44 @@ router.get('/', async (req, res) => {
   }
 });
 
+// POST /categories
+router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const { name, description, parentCategoryId } = req.body;
+
+    if (mongoose.connection.readyState !== 1) {
+      const newCategory = {
+        _id: Math.random().toString(36).substr(2, 9),
+        name,
+        description,
+        parentCategoryId: parentCategoryId || null
+      };
+      mockCategories.push(newCategory);
+      console.log("✅ Offline Mode: Yeni kategori (Mock) eklendi:", newCategory);
+      return res.status(201).json({
+        ...newCategory,
+        id: newCategory._id
+      });
+    }
+
+    if (!name) {
+      return res.status(400).json({ message: 'Kategori adı gereklidir' });
+    }
+
+    const category = new Category({
+      name,
+      description,
+      parentCategoryId: parentCategoryId || null
+    });
+
+    await category.save();
+    res.status(201).json(category);
+  } catch (error: any) {
+    console.error('❌ POST /categories error:', error);
+    res.status(400).json({ message: 'Geçersiz istek verisi', error: error.message });
+  }
+});
+
 // PUT /categories/:categoryId
 router.put('/:categoryId', authenticate, requireAdmin, async (req: AuthRequest, res) => {
   try {
@@ -106,6 +144,38 @@ router.put('/:categoryId', authenticate, requireAdmin, async (req: AuthRequest, 
     });
   } catch (error) {
     res.status(400).json({ message: 'Geçersiz istek verisi' });
+  }
+});
+
+// DELETE /categories/:categoryId
+router.delete('/:categoryId', authenticate, requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      const index = mockCategories.findIndex(c => c._id === req.params.categoryId);
+      if (index !== -1) {
+        const deleted = mockCategories.splice(index, 1);
+        console.log("✅ Offline Mode: Kategori (Mock) silindi:", deleted[0]);
+        return res.json({ message: 'Kategori başarıyla silindi (Mock)' });
+      }
+      return res.status(404).json({ message: 'Kategori bulunamadı' });
+    }
+
+    const category = await Category.findByIdAndDelete(req.params.categoryId);
+
+    if (!category) {
+      return res.status(404).json({ message: 'Kategori bulunamadı' });
+    }
+
+    // Alt kategorileri güncelle (opsiyonel: onları da silebiliriz veya yetim bırakabiliriz)
+    await Category.updateMany(
+      { parentCategoryId: req.params.categoryId },
+      { $set: { parentCategoryId: null } }
+    );
+
+    res.json({ message: 'Kategori başarıyla silindi' });
+  } catch (error: any) {
+    console.error('❌ DELETE /categories error:', error);
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
   }
 });
 

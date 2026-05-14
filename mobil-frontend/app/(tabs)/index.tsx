@@ -49,7 +49,7 @@ export default function HomeScreen() {
 
   const renderHeader = () => (
     <View className="bg-white">
-      <WebHeader />
+      {Platform.OS === 'web' && <WebHeader />}
 
       {/* Hero Slider Section */}
       <HeroSlider />
@@ -58,8 +58,8 @@ export default function HomeScreen() {
       <CategoryGrid />
 
       {/* Featured Products Header */}
-      <View className="px-6 mb-8 mt-4 items-center">
-        <Text className="font-playfair text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">Öne Çıkan Ürünler</Text>
+      <View className="px-5 mb-6 mt-4 items-center">
+        <Text className="font-playfair text-2xl font-bold text-slate-900 tracking-tight">Öne Çıkan Ürünler</Text>
         <View className="h-1 w-16 bg-[#D48806] rounded-full mt-3" />
       </View>
     </View>
@@ -77,7 +77,7 @@ export default function HomeScreen() {
         renderItem={({ item }) => <ProductCard product={item} />}
         ListHeaderComponent={renderHeader}
         numColumns={2}
-        columnWrapperStyle={{ paddingHorizontal: 16, gap: 16 }}
+        columnWrapperStyle={{ paddingHorizontal: 12, gap: 12 }}
         contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 40 : 0 }}
         style={Platform.OS === 'web' ? ({ flex: 1, overflowY: 'auto' } as any) : undefined}
         refreshControl={

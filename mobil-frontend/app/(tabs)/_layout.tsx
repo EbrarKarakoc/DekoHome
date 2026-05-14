@@ -7,20 +7,29 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#D48806', // Mustard
-        tabBarInactiveTintColor: '#94a3b8', // Slate-400
+        tabBarActiveTintColor: '#D48806',
+        tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: {
-          backgroundColor: '#0f172a', // Slate-900
+          backgroundColor: '#0f172a',
           borderTopWidth: 0,
-          boxShadow: [{ color: 'rgba(0, 0, 0, 0.1)', offsetX: 0, offsetY: -4, blurRadius: 12 }],
-          height: Platform.OS === 'ios' ? 88 : 68,
-          paddingBottom: Platform.OS === 'ios' ? 30 : 12,
-          paddingTop: 12,
+          position: 'absolute', // Havada süzülme efekti
+          bottom: 20, // Alttan 20 birim yukarı kaldırdık (Sistem butonlarından kaçmak için)
+          left: 20,
+          right: 20,
+          borderRadius: 25,
+          height: 65,
+          paddingBottom: 0,
+          paddingTop: 0,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.3,
+          shadowRadius: 20,
+          elevation: 5,
         },
         tabBarLabelStyle: {
           fontFamily: 'Inter_700Bold',
           fontSize: 10,
-          marginTop: 4,
+          marginBottom: 10,
         },
       }}
     >

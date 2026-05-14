@@ -10,46 +10,106 @@ import {
   TextInput,
   View,
   Modal,
+  Alert,
 } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
 import Colors from '@constants/colors';
-import { useCategories, useUpdateCategory } from '@hooks/useCategories';
+import { useCategories, useUpdateCategory, useCreateCategory, useDeleteCategory } from '@hooks/useCategories';
 import type { Category } from '@/types';
 import { getErrorMessage } from '@utils/error';
 
 export default function AdminCategoriesScreen() {
   const { data: categories = [], isLoading, isRefetching, refetch } = useCategories();
+  const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
   const { mutate: updateCategory, isPending: isUpdating } = useUpdateCategory();
+  const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
+
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleAddNew = () => {
+    setIsEditMode(false);
+    setEditingCategory(null);
+    setName('');
+    setDescription('');
+    setModalVisible(true);
+  };
 
   const handleEdit = (category: Category) => {
+    setIsEditMode(true);
     setEditingCategory(category);
     setName(category.name);
     setDescription(category.description || '');
     setModalVisible(true);
   };
 
-  const handleSave = () => {
-    if (!editingCategory) return;
-    const categoryId = editingCategory.id || editingCategory._id;
+  const handleDelete = (category: Category) => {
+    const categoryId = category.id || category._id;
     if (!categoryId) return;
 
-    updateCategory(
-      { id: categoryId, data: { name, description } },
-      {
-        onSuccess: () => {
-          showMessage({ message: 'Kategori başarıyla güncellendi', type: 'success' });
-          setModalVisible(false);
+    Alert.alert(
+      'Kategoriyi Sil',
+      `"${category.name}" kategorisini silmek istediğinize emin misiniz?`,
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: () => {
+            deleteCategory(categoryId, {
+              onSuccess: () => {
+                showMessage({ message: 'Kategori başarıyla silindi', type: 'success' });
+              },
+              onError: (error) => {
+                showMessage({ message: getErrorMessage(error), type: 'danger' });
+              },
+            });
+          },
         },
-        onError: (error) => {
-          showMessage({ message: getErrorMessage(error), type: 'danger' });
-        },
-      }
+      ]
     );
+  };
+
+  const handleSave = () => {
+    if (!name.trim()) {
+      showMessage({ message: 'Kategori adı gereklidir', type: 'warning' });
+      return;
+    }
+
+    if (isEditMode && editingCategory) {
+      const categoryId = editingCategory.id || editingCategory._id;
+      if (!categoryId) return;
+
+      updateCategory(
+        { id: categoryId, data: { name, description } },
+        {
+          onSuccess: () => {
+            showMessage({ message: 'Kategori başarıyla güncellendi', type: 'success' });
+            setModalVisible(false);
+          },
+          onError: (error) => {
+            showMessage({ message: getErrorMessage(error), type: 'danger' });
+          },
+        }
+      );
+    } else {
+      createCategory(
+        { name, description },
+        {
+          onSuccess: () => {
+            showMessage({ message: 'Kategori başarıyla oluşturuldu', type: 'success' });
+            setModalVisible(false);
+          },
+          onError: (error) => {
+            showMessage({ message: getErrorMessage(error), type: 'danger' });
+          },
+        }
+      );
+    }
   };
 
   const renderCategoryItem = (item: Category, level: number = 0) => (
@@ -82,7 +142,10 @@ export default function AdminCategoriesScreen() {
           >
             <Edit2 size={18} color={Colors.primary} />
           </Pressable>
-          <Pressable style={{ padding: 4 }}>
+          <Pressable 
+            onPress={() => handleDelete(item)}
+            style={{ padding: 4 }}
+          >
             <Trash2 size={18} color={Colors.error} />
           </Pressable>
         </View>
@@ -91,6 +154,8 @@ export default function AdminCategoriesScreen() {
     </View>
   );
 
+  const isPending = isCreating || isUpdating || isDeleting;
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <View style={{ padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -98,6 +163,7 @@ export default function AdminCategoriesScreen() {
           HİYERARŞİK LİSTE
         </Text>
         <Pressable
+          onPress={handleAddNew}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -124,12 +190,11 @@ export default function AdminCategoriesScreen() {
         )}
       </ScrollView>
 
-      {/* Edit Modal (Placeholder) */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
           <View style={{ backgroundColor: Colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24 }}>
             <Text style={{ fontSize: 20, fontWeight: '700', color: Colors.text, marginBottom: 20 }}>
-              Kategori Düzenle
+              {isEditMode ? 'Kategori Düzenle' : 'Yeni Kategori'}
             </Text>
             <View style={{ marginBottom: 20 }}>
               <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.textSecondary, marginBottom: 8 }}>KATEGORİ ADI</Text>
@@ -177,7 +242,7 @@ export default function AdminCategoriesScreen() {
               </Pressable>
               <Pressable
                 onPress={handleSave}
-                disabled={isUpdating}
+                disabled={isPending}
                 style={{
                   flex: 1,
                   height: 50,
@@ -185,13 +250,15 @@ export default function AdminCategoriesScreen() {
                   backgroundColor: Colors.primary,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  opacity: isUpdating ? 0.7 : 1,
+                  opacity: isPending ? 0.7 : 1,
                 }}
               >
-                {isUpdating ? (
+                {isPending ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
-                  <Text style={{ fontWeight: '700', color: '#FFFFFF' }}>Kaydet</Text>
+                  <Text style={{ fontWeight: '700', color: '#FFFFFF' }}>
+                    {isEditMode ? 'Kaydet' : 'Oluştur'}
+                  </Text>
                 )}
               </Pressable>
             </View>
