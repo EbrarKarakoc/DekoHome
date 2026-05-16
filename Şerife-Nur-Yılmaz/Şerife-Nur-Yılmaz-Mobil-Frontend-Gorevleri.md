@@ -1,5 +1,5 @@
 # Şerife Nur Yılmaz'ın Mobil Frontend Görevleri
-**Mobile Front-end Demo Videosu:** [Link buraya eklenecek]
+**Mobile Front-end Demo Videosu:** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Mobil%20Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/m-NwTNpaVm8)
 
 ## 1. Kategori Güncelleme Ekranı
 - **API Endpoint:** `PUT /categories/{categoryId}`

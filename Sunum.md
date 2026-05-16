@@ -65,7 +65,9 @@
 - İsim: Şerife Nur Yılmaz
 - Rol: Kategori İşlemleri & Ürün Yönetimi
 
-**Gereksinim Videosu:** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05)
+**Gereksinim Videosu (Web):** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Web%20Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/1f85hezQsTw?si=NvyQYOwkbsZ1cV05)
+**Gereksinim Videosu (Mobil):** [![▶ Videoyu İzle](https://img.shields.io/badge/YouTube-Mobil%20Gereksinim%20Videosu-red?logo=youtube&style=for-the-badge)](https://youtu.be/m-NwTNpaVm8)
+
 
 **Gereksinimler:**
 1. **Kategori Güncelleme**
